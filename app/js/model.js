@@ -4,7 +4,7 @@ import { uid } from './util.js';
 
 export const SCHEMA = 2;
 export const INBOX = 'inbox';
-export const SPEEDS = [0.25, 0.5, 1, 1.5, 2];
+export const SPEEDS = [0.5, 0.75, 1, 1.5, 2];
 
 export function emptyState() {
   return {
