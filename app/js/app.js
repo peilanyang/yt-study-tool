@@ -69,8 +69,12 @@ function initControls() {
     $$('#speeds button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.rate) === r)));
   });
   const applyTheater = () => {
-    document.body.classList.toggle('theater', !!ctx.state.settings.theater);
-    $('#bTheater').setAttribute('aria-pressed', String(!!ctx.state.settings.theater));
+    const on = !!ctx.state.settings.theater;
+    document.body.classList.toggle('theater', on);
+    const b = $('#bTheater');
+    b.setAttribute('aria-pressed', String(on));
+    b.textContent = on ? '↙ 一般畫面' : '⛶ 大畫面';
+    b.title = on ? '回到原本的版面（顯示播放清單與右側面板）' : '隱藏清單、放大播放器，畫質與截圖會更清楚';
   };
   $('#bTheater').addEventListener('click', () => { ctx.state.settings.theater = !ctx.state.settings.theater; ctx.save(); applyTheater(); });
   applyTheater();
