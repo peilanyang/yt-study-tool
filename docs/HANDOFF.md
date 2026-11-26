@@ -12,7 +12,7 @@ YouTube 教學影片學習工具：貼網址 → 取得逐字稿（標點、分�
 
 - 階段：**2 開發**。關卡 G1（文件定稿）已於 2026-11-26 通過。
 - 仍待使用者確認：需求規格第 9 節 NFR-02、NFR-07 的「建議值」（可在驗收時依實測調整）。
-- Git：本機儲存庫已建立（main），GitHub 公開儲存庫建立中。
+- Git：完成。GitHub 公開儲存庫 https://github.com/peilanyang/yt-study-tool ；使用者專案資料夾已是它的本機複本（main 追蹤 origin/main）。
 - 程式碼：尚未開始，下一個任務是 T04（v1 拆成 ES Modules、加 start.bat）。
 - v1 舊版工具：`legacy/yt-study-v1.html`（單一 HTML，可用但不再擴充）。
 
@@ -54,7 +54,7 @@ YouTube 教學影片學習工具：貼網址 → 取得逐字稿（標點、分�
 
 ## 6. 下一步
 
-1. 完成 T03：推到 GitHub 公開儲存庫 `peilanyang/yt-study-tool`、開 GitHub Pages、本機資料夾連上遠端。
+1. GitHub Pages 尚未開啟：等 T04 有 `app/` 後，請使用者在 GitHub 儲存庫 Settings → Pages → Deploy from a branch → main / (root) 開啟（Claude 無法用 API 開）。
 2. 依專案管理第 3 節任務表 T04 起開發，每個功能一條 `feature/` 分支；開發初期先實測風險 R9（字幕偵測）。
 3. commit 作者：`peilanyang <peilanyang@users.noreply.github.com>`；已啟用 `scripts/hooks/pre-commit` 金鑰掃描（`git config core.hooksPath scripts/hooks`）。
 
@@ -64,3 +64,4 @@ YouTube 教學影片學習工具：貼網址 → 取得逐字稿（標點、分�
 - 匯出文件的方法：Claude Docs `export` 用 `format: docx`、`pictures: fit`（結果存成檔案）→ 解 base64 → `pandoc -t gfm --extract-media` 轉 Markdown；圖片資料夾用英文名（`01-requirements` 等），否則路徑亂碼。
 - 文件集分頁 file id：需求規格 `885e1541-c0e2`、架構 `5135d156-4b34`、資安 `f10f467c-268f`、專案管理 `15faa16f-ad15`、Git `2845ff0b-ff1c`。
 - Git 在連線資料夾內需先取得「刪除權限」，否則 git 的 lock 檔會出錯。
+- 同步方式：在雲端工作區 `/home/claude/yt-study-tool` 開發並 push，再到使用者資料夾 `git pull`。不要用 device_commit_files 傳 PNG（輸出儲存區會重新編碼圖片，造成 git 顯示修改）。
