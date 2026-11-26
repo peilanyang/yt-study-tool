@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.youtube.com https://s.ytimg.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; img-src 'self' blob: data: https://i.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' blob: data:; media-src blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>影片教學工具</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/app.css">
+<script type="module" src="js/app.js"></script>
+</head>
+<body>
+<header class="top">
+  <button class="ghost" id="tglSide" aria-label="顯示或隱藏播放清單">☰</button>
+  <h1>影片教學工具</h1>
+  <span class="grow"></span>
+  <span id="backupHint" class="hint"></span>
+  <button id="btnExportMd">匯出 .md</button>
+  <button id="btnBackup">備份</button>
+  <button id="btnRestore">還原</button>
+  <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+</header>
+
+<div id="app">
+  <aside id="side" aria-label="播放清單">
+    <button class="dashed" id="btnNewPl">＋ 新增播放清單</button>
+    <button class="primary block" id="btnAddVideo">＋ 貼上 YouTube 網址</button>
+    <div id="pls"></div>
+  </aside>
+
+  <main id="main">
+    <section id="left">
+      <div id="playerWrap">
+        <div id="player"></div>
+        <div id="empty">從左邊「貼上 YouTube 網址」加入影片，點影片就能開始</div>
+        <div id="flash"></div>
+        <button class="fs-shot primary" id="fsShot" title="截圖">📷 截圖</button>
+        <button class="fs-exit" id="fsExit" title="離開全螢幕（Esc）">離開全螢幕</button>
+      </div>
+      <div id="vtitle"></div>
+      <div class="ctl">
+        <button id="bBack" title="倒退 5 秒（←）">⏪ 5 秒</button>
+        <button id="bPlay" aria-label="播放或暫停（空白鍵）">⏯</button>
+        <button id="bFwd" title="快轉 5 秒（→）">5 秒 ⏩</button>
+        <span class="tm" id="tm">0:00</span>
+        <div class="seg-group" role="group" aria-label="播放速度" id="speeds"></div>
+        <button id="bTheater" aria-pressed="false" title="隱藏清單、放大播放器，畫質與截圖會更清楚">⛶ 大畫面</button>
+        <button id="bFull" title="全螢幕播放，截圖最清楚">⤢ 全螢幕</button>
+        <span class="grow"></span>
+        <button class="primary" id="bShot" title="截取影片畫面（S）">📷 截圖 <kbd>S</kbd></button>
+        <button id="bNote" title="在目前時間加筆記（N）">筆記 <kbd>N</kbd></button>
+      </div>
+      <div class="ctl small">
+        <span class="hint" id="qualityTip">畫面模糊時：按「大畫面」或「全螢幕」，或在播放器右下角 ⚙ →「畫質」選 1080p。快捷鍵：S 截圖、N 筆記、空白鍵 播放／暫停、← → 前後 5 秒。</span>
+      </div>
+      <div class="ctl small">
+        <span id="capState">第一次截圖時，瀏覽器會問要分享哪個畫面，請選「這個分頁」。</span>
+        <button class="ghost" id="bStopCap" hidden>停止分享</button>
+      </div>
+    </section>
+
+    <section id="panel">
+      <div class="tabs" role="tablist">
+        <button role="tab" data-tab="tr" aria-selected="true">逐字稿</button>
+        <button role="tab" data-tab="sh" aria-selected="false">截圖 <span id="shCount"></span></button>
+        <button role="tab" data-tab="nt" aria-selected="false">筆記 <span id="ntCount"></span></button>
+      </div>
+
+      <div class="pane" id="tab-tr">
+        <div class="banner" id="trEmpty" hidden>
+          <span>這部影片還沒有逐字稿。</span>
+          <button class="primary" data-action="gen">產生逐字稿</button>
+        </div>
+        <div class="toolbar" id="trTools" hidden>
+          <button class="accent" id="bTranslate">翻譯成中文</button>
+          <div class="seg-group" role="group" aria-label="顯示方式" id="viewGroup">
+            <button data-view="o">原文</button>
+            <button data-view="bi">雙語</button>
+            <button data-view="z">中文</button>
+          </div>
+          <label class="check"><input type="checkbox" id="follow" checked> 跟隨播放</label>
+          <span class="grow"></span>
+          <input type="search" id="q" placeholder="搜尋…" aria-label="搜尋逐字稿">
+          <button class="ghost" data-action="gen" title="重新產生逐字稿">重新產生</button>
+        </div>
+        <div class="toolbar small" id="spkBar" hidden></div>
+        <div class="body" id="segs"></div>
+      </div>
+
+      <div class="pane" id="tab-sh" hidden>
+        <p class="hint pad">截圖依時間排序；點圖片放大，可下載、複製、跳到該時間。</p>
+        <div class="body"><div class="grid" id="shots"></div></div>
+      </div>
+
+      <div class="pane" id="tab-nt" hidden>
+        <div class="banner" id="ntGen" hidden>
+          <span>這部影片是「只看影片」加入的，還沒有逐字稿。</span>
+          <button class="primary" data-action="gen">產生逐字稿</button>
+        </div>
+        <div class="newnote">
+          <label for="noteIn" id="noteInLabel">新筆記（會記下目前時間）</label>
+          <textarea id="noteIn" rows="2" placeholder="輸入筆記，Ctrl+Enter 儲存"></textarea>
+          <div class="row">
+            <label class="check"><input type="checkbox" id="noteAtTime" checked> 記錄目前時間</label>
+            <span class="grow"></span>
+            <button id="bCopyNotes">複製全部筆記</button>
+            <button class="primary" id="bAddNote">儲存筆記</button>
+          </div>
+        </div>
+        <div class="body" id="notes"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- 加入影片（F1） -->
+<dialog id="dlgAdd" aria-labelledby="addTitle">
+  <form method="dialog" class="box">
+    <div class="row"><h2 id="addTitle">加入影片</h2><span class="grow"></span><button class="ghost" value="cancel" aria-label="關閉">✕</button></div>
+    <label for="addUrl">YouTube 網址</label>
+    <input id="addUrl" type="url" placeholder="https://www.youtube.com/watch?v=…" autocomplete="off">
+    <div class="preview" id="addPreview" hidden>
+      <img id="addThumb" alt="影片縮圖" width="128" height="72">
+      <div><div id="addId" class="hint"></div><div class="hint">影片標題會在播放器載入後自動帶入</div></div>
+    </div>
+    <label for="addPl">加入到播放清單</label>
+    <select id="addPl"></select>
+    <p class="hint">不確定放哪裡就先放「未分類」，之後可以搬到其他清單。</p>
+    <p class="strong">你想怎麼看這部影片？</p>
+    <div class="choices">
+      <button class="choice main" id="addGen" value="gen" disabled>
+        <b>產生逐字稿</b><span>先取得字幕並整理成逐字稿（標點、分段、講者、時間），適合先讀再看。</span>
+      </button>
+      <button class="choice" id="addWatch" value="watch" disabled>
+        <b>只看影片</b><span>直接看影片、截圖、記筆記。需要逐字稿時，隨時再按「產生逐字稿」。</span>
+      </button>
+    </div>
+  </form>
+</dialog>
+
+<!-- 產生逐字稿三步驟（F2、F7） -->
+<dialog id="dlgGen" aria-labelledby="genTitle">
+  <div class="box wide">
+    <div class="row"><h2 id="genTitle">產生逐字稿</h2><span class="grow"></span><button class="ghost" data-close aria-label="關閉">✕</button></div>
+    <ol class="stepper" aria-label="進度">
+      <li id="st1">步驟 1 取得字幕</li><li aria-hidden="true">→</li>
+      <li id="st2">步驟 2 交給 Claude 整理</li><li aria-hidden="true">→</li>
+      <li id="st3">步驟 3 貼回結果</li>
+      <li class="grow right hint">依序完成，共 3 步</li>
+    </ol>
+    <section class="step" id="step1">
+      <h3>步驟 1：取得字幕</h3>
+      <ol class="howto">
+        <li><a id="ytOpen" href="#" target="_blank" rel="noopener noreferrer">在 YouTube 打開這部影片 ↗</a></li>
+        <li>影片下方說明欄按「…更多」，往下捲到「轉錄稿」，按「顯示轉錄稿」。</li>
+        <li>右側出現「時間＋文字」：用滑鼠從第一行<b>拖曳</b>選到最後一行，按 <kbd>Ctrl</kbd>+<kbd>C</kbd>（不要用 Ctrl+A）。</li>
+        <li>回到這裡，在下面框框按 <kbd>Ctrl</kbd>+<kbd>V</kbd>。</li>
+      </ol>
+      <p class="hint">找不到「顯示轉錄稿」代表影片沒有字幕，之後可用 Windows 小程式處理。也可以直接上傳 .srt / .vtt 字幕檔。</p>
+      <textarea id="rawIn" rows="7" placeholder="0:00&#10;Hello everyone, welcome back…"></textarea>
+      <div class="row"><input type="file" id="subFile" accept=".srt,.vtt,.txt"><span class="hint" id="rawInfo"></span></div>
+    </section>
+    <section class="step" id="step2">
+      <h3>步驟 2：交給 Claude 整理</h3>
+      <p class="hint">按下面的按鈕複製提示詞，貼到 Claude 對話送出。Claude 會加上標點、分段、標出講者與時間。字幕很長時會分成幾份，請依序處理。</p>
+      <div class="row wrap" id="parts"></div>
+    </section>
+    <section class="step" id="step3">
+      <h3>步驟 3：貼回 Claude 的回覆</h3>
+      <textarea id="jsonIn" rows="5" placeholder="把 Claude 回覆的內容整段貼到這裡（分成幾份時，每份貼完按「加入這一份」）"></textarea>
+      <div class="row"><button id="bAddPart">加入這一份</button><span class="hint" id="jsonInfo"></span></div>
+    </section>
+    <div class="row end">
+      <button id="bRawOnly" class="ghost">不整理，直接匯入字幕</button>
+      <span class="grow"></span>
+      <button data-close>取消</button>
+      <button class="dark" id="bGenDone">完成</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- 翻譯（F2） -->
+<dialog id="dlgTr" aria-labelledby="trTitle">
+  <div class="box wide">
+    <div class="row"><h2 id="trTitle">翻譯成中文</h2><span class="grow"></span><button class="ghost" data-close aria-label="關閉">✕</button></div>
+    <p class="hint">1. 按按鈕複製提示詞，貼到 Claude 對話送出。2. 把回覆貼到下面，按「加入這一份」。全部加入後按「完成」。</p>
+    <div class="row wrap" id="trParts"></div>
+    <textarea id="trIn" rows="6" placeholder="把 Claude 回覆的翻譯貼到這裡"></textarea>
+    <div class="row"><button id="bTrAdd">加入這一份</button><span class="hint" id="trInfo"></span><span class="grow"></span><button data-close>取消</button><button class="dark" id="bTrDone">完成</button></div>
+  </div>
+</dialog>
+
+<!-- 截圖放大 -->
+<dialog id="dlgLb" aria-label="截圖">
+  <div class="box lb">
+    <img id="lbImg" alt="截圖">
+    <div class="row center wrap">
+      <span id="lbTime" class="hint"></span>
+      <button id="lbSeek">跳到這個時間</button>
+      <button id="lbCopy">複製圖片</button>
+      <button id="lbDl">下載 PNG</button>
+      <button id="lbDel">刪除截圖</button>
+      <button class="dark" data-close>關閉</button>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

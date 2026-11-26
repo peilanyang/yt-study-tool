@@ -17,9 +17,23 @@
 
 文件正本在 Claude Docs（線上編輯、留言），每次修改後重新匯出到 `docs/`。
 
-## 目前可用
+## 開啟工具
 
-- `legacy/yt-study-v1.html`：v1 工具（播放、逐字稿整理、講者、筆記、播放清單、截圖）。
+1. 電腦需有 Python（https://www.python.org ，安裝時勾選 Add python.exe to PATH）。
+2. 雙擊專案資料夾的 `start.bat`，瀏覽器會自動開啟 http://localhost:8765/ 。
+3. 使用期間不要關閉 `start.bat` 的黑色視窗。
+
+請用電腦版 Chrome 或 Edge。直接雙擊 `app/index.html` 無法播放 YouTube（錯誤 153）。
+
+## 開發
+
+- 程式在 `app/`（原生 ES Modules，不需建置）。
+- 單元測試：`node --test tests/js/*.test.mjs`
+- 分支、Commit、版本規則見 `docs/05-Git版本管理規範.md`。
+
+## 舊版
+
+- `legacy/yt-study-v1.html`：v1 單一 HTML 工具，保留參考，不再更新。
 
 ## 授權與使用提醒
 
