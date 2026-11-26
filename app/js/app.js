@@ -68,6 +68,17 @@ function initControls() {
     player.setRate(r);
     $$('#speeds button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.rate) === r)));
   });
+  const applyTheater = () => {
+    document.body.classList.toggle('theater', !!ctx.state.settings.theater);
+    $('#bTheater').setAttribute('aria-pressed', String(!!ctx.state.settings.theater));
+  };
+  $('#bTheater').addEventListener('click', () => { ctx.state.settings.theater = !ctx.state.settings.theater; ctx.save(); applyTheater(); });
+  applyTheater();
+  $('#bFull').addEventListener('click', () => {
+    $('#playerWrap').requestFullscreen?.().catch(() => toast('這個瀏覽器不允許全螢幕'));
+  });
+  $('#fsExit').addEventListener('click', () => document.exitFullscreen?.());
+  $('#fsShot').addEventListener('click', () => $('#bShot').click());
   // 「產生逐字稿」按鈕可能出現在多處
   document.addEventListener('click', (e) => { if (e.target.closest('[data-action=gen]')) openGen(); });
   setInterval(() => { if (player.isReady()) $('#tm').textContent = `${fmt(player.now())} / ${fmt(player.duration())}`; }, 500);

@@ -36,7 +36,7 @@ a { color: var(--acc-ink); }
 header.top { height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
 header.top h1 { font-size: 16px; margin: 0; }
 #app { display: grid; grid-template-columns: 280px 1fr; height: calc(100% - 52px); }
-#app.nosb { grid-template-columns: 0 1fr; }
+#app.nosb { grid-template-columns: 1fr; }
 #app.nosb #side { display: none; }
 
 #side { background: var(--panel); border-right: 1px solid var(--line); overflow: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
@@ -56,7 +56,7 @@ header.top h1 { font-size: 16px; margin: 0; }
 #main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(360px, 1fr); gap: 14px; padding: 14px; overflow: hidden; min-height: 0; }
 @media (max-width: 1100px) { #main { grid-template-columns: 1fr; overflow: auto; } #panel { min-height: 640px; } }
 #left { display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow: auto; }
-#playerWrap { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #18181b; border-radius: 12px; overflow: hidden; }
+#playerWrap { flex-shrink: 0; position: relative; width: 100%; aspect-ratio: 16 / 9; background: #18181b; border-radius: 12px; overflow: hidden; }
 #playerWrap iframe, #player { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 #empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #a1a1aa; padding: 20px; text-align: center; }
 #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; transition: opacity .25s; }
@@ -145,3 +145,17 @@ dialog::backdrop { background: #0008; }
 #toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: #222; color: #fff; padding: 8px 14px; border-radius: 8px; opacity: 0; transition: opacity .2s; z-index: 99; pointer-events: none; max-width: 90vw; }
 #toast.on { opacity: 1; }
 .howto { margin: 0; padding-left: 22px; font-size: 13.5px; line-height: 1.9; }
+
+/* 大畫面：隱藏清單，播放器用滿寬度，面板移到下方 */
+body.theater #app { grid-template-columns: 1fr; }
+body.theater #side { display: none; }
+body.theater #main { grid-template-columns: 1fr; overflow: auto; }
+body.theater #left { overflow: visible; }
+body.theater #panel { min-height: 560px; }
+/* 全螢幕截圖按鈕：只在全螢幕時出現 */
+.fs-shot, .fs-exit { display: none; position: absolute; z-index: 2; top: 16px; }
+.fs-shot { right: 16px; min-height: 44px; padding: 0 18px; }
+.fs-exit { right: 150px; min-height: 44px; background: #000a; color: #fff; border-color: #fff6; }
+#playerWrap:fullscreen { border-radius: 0; }
+#playerWrap:fullscreen .fs-shot, #playerWrap:fullscreen .fs-exit { display: inline-flex; align-items: center; }
+body.theater #playerWrap { width: min(100%, calc((100vh - 200px) * 16 / 9)); margin: 0 auto; }

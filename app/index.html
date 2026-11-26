@@ -37,6 +37,8 @@
         <div id="player"></div>
         <div id="empty">從左邊「貼上 YouTube 網址」加入影片，點影片就能開始</div>
         <div id="flash"></div>
+        <button class="fs-shot primary" id="fsShot" title="截圖">📷 截圖</button>
+        <button class="fs-exit" id="fsExit" title="離開全螢幕（Esc）">離開全螢幕</button>
       </div>
       <div id="vtitle"></div>
       <div class="ctl">
@@ -45,9 +47,14 @@
         <button id="bFwd" title="快轉 5 秒（→）">5 秒 ⏩</button>
         <span class="tm" id="tm">0:00</span>
         <div class="seg-group" role="group" aria-label="播放速度" id="speeds"></div>
+        <button id="bTheater" aria-pressed="false" title="隱藏清單、放大播放器，畫質與截圖會更清楚">⛶ 大畫面</button>
+        <button id="bFull" title="全螢幕播放，截圖最清楚">⤢ 全螢幕</button>
         <span class="grow"></span>
         <button class="primary" id="bShot" title="截取影片畫面（S）">📷 截圖 <kbd>S</kbd></button>
         <button id="bNote" title="在目前時間加筆記（N）">筆記 <kbd>N</kbd></button>
+      </div>
+      <div class="ctl small">
+        <span class="hint" id="qualityTip">畫面模糊時：按「大畫面」或「全螢幕」，或在播放器右下角 ⚙ →「畫質」選 1080p。</span>
       </div>
       <div class="ctl small">
         <span id="capState">第一次截圖時，瀏覽器會問要分享哪個畫面，請選「這個分頁」。</span>

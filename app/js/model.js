@@ -12,7 +12,7 @@ export function emptyState() {
     playlists: [{ id: INBOX, name: '未分類', videos: [], locked: true }],
     videos: {},
     current: null,
-    settings: { view: 'o', pauseOnShot: true, lang: '繁體中文（台灣用語）' },
+    settings: { view: 'o', pauseOnShot: true, theater: false, lang: '繁體中文（台灣用語）' },
     lastBackupAt: 0,
   };
 }
@@ -72,6 +72,7 @@ export function normalizeState(input) {
     settings: {
       view: ['o', 'bi', 'z'].includes(s.view) ? s.view : 'o',
       pauseOnShot: s.pauseOnShot !== false,
+      theater: s.theater === true,
       lang: typeof s.lang === 'string' ? s.lang : base.settings.lang,
     }, // 注意：舊版的 apiKey 一律不帶入（資安規範 3.1）
     lastBackupAt: Number(input.lastBackupAt) || 0,

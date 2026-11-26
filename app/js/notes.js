@@ -68,6 +68,7 @@ async function takeShot() {
     freshId = n.id;
     ctx.switchTab('nt');
     await render();
+    if (document.fullscreenElement) { toast(`已截圖 ${fmt(t)}，離開全螢幕後可寫筆記`); return; }
     const ta = $(`#notes textarea[data-note="${n.id}"]`);
     if (ta) { ta.scrollIntoView({ block: 'nearest' }); ta.focus(); }
   } catch (e) {
