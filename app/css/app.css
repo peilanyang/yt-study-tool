@@ -162,3 +162,7 @@ body.theater #playerWrap { width: min(100%, calc((100vh - 200px) * 16 / 9)); mar
 #bTheater[aria-pressed=true] { background: var(--ink); border-color: var(--ink); color: #fff; font-weight: 700; }
 body.theater #playerWrap .fs-shot { display: inline-flex; align-items: center; }
 body.theater #playerWrap { width: min(100%, calc((100vh - 260px) * 16 / 9)); }
+/* 大畫面（最終版）：控制列永遠留在畫面內，播放器只用剩下的高度；影片比例由 YouTube 播放器自動加黑邊 */
+body.theater #left { height: calc(100vh - 80px); overflow: hidden; }
+body.theater #playerWrap { flex: 1 1 0; min-height: 160px; width: 100%; aspect-ratio: auto; margin: 0; }
+body.theater #left > .ctl, body.theater #vtitle { flex: none; }

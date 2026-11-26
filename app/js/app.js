@@ -94,6 +94,7 @@ function initKeys() {
     if (t.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
     if (e.ctrlKey || e.metaKey || e.altKey || document.querySelector('dialog[open]')) return;
     const k = e.key.toLowerCase();
+    if (k === 'escape' && ctx.state.settings.theater && !document.fullscreenElement) { $('#bTheater').click(); return; }
     if (k === 's') { e.preventDefault(); $('#bShot').click(); }
     else if (k === 'n') { e.preventDefault(); $('#bNote').click(); }
     else if (k === ' ') { e.preventDefault(); player.toggle(); }
