@@ -160,3 +160,5 @@ body.theater #panel { min-height: 560px; }
 #playerWrap:fullscreen .fs-shot, #playerWrap:fullscreen .fs-exit { display: inline-flex; align-items: center; }
 body.theater #playerWrap { width: min(100%, calc((100vh - 200px) * 16 / 9)); margin: 0 auto; }
 #bTheater[aria-pressed=true] { background: var(--ink); border-color: var(--ink); color: #fff; font-weight: 700; }
+body.theater #playerWrap .fs-shot { display: inline-flex; align-items: center; }
+body.theater #playerWrap { width: min(100%, calc((100vh - 260px) * 16 / 9)); }

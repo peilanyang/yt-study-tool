@@ -100,6 +100,13 @@ function initKeys() {
     else if (k === 'arrowleft') player.skip(-5);
     else if (k === 'arrowright') player.skip(5);
   });
+  // 點了 YouTube 播放器後，鍵盤會被 iframe 拿走；把焦點拿回來，S、N 等快捷鍵才有作用
+  window.addEventListener('blur', () => {
+    setTimeout(() => {
+      const a = document.activeElement;
+      if (a && a.tagName === 'IFRAME' && a.closest('#playerWrap')) { a.blur(); window.focus(); }
+    }, 0);
+  });
   // 在頁面任意處貼上 YouTube 網址 → 開啟加入影片
   document.addEventListener('paste', (e) => {
     const t = e.target;
