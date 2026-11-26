@@ -20,7 +20,7 @@
 ## 開啟工具
 
 1. 電腦需有 Python（https://www.python.org ，安裝時勾選 Add python.exe to PATH）。
-2. 雙擊專案資料夾的 `start.bat`，瀏覽器會自動開啟 http://localhost:8000/ 。
+2. 雙擊專案資料夾的 `start.bat`，瀏覽器會自動開啟 http://localhost:8765/ 。
 3. 使用期間不要關閉 `start.bat` 的黑色視窗。
 
 請用電腦版 Chrome 或 Edge。直接雙擊 `app/index.html` 無法播放 YouTube（錯誤 153）。
