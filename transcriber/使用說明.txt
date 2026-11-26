@@ -38,7 +38,7 @@ YouTube 字幕小程式 使用說明
 
 五、常見問題
   ‧ 「讀取失敗」或「音訊下載失敗」：YouTube 常改版，請再執行一次 install.bat 更新 yt-dlp。
-  ‧ 「還沒安裝」：先執行 install.bat。
+  ‧ 還沒安裝就雙擊 transcribe.bat：會自動先跑安裝。
   ‧ 中文錯字多：改用「準確」模式；之後交給 Claude 整理時也會修正明顯錯字。
 
 六、提醒

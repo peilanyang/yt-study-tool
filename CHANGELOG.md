@@ -4,6 +4,9 @@
 
 ## [未發佈]
 
+### 修正
+- .bat 檔含中文時 cmd.exe 會把指令切壞（安裝失敗、出現 'nv' is not recognized）：.bat 改為純 ASCII，安裝流程與中文訊息移到 install.py；pre-commit 擋含非 ASCII 的 .bat。
+
 ### 新增
 - Windows 字幕小程式（T05）：先抓 YouTube 字幕（人工優先、自動其次），沒有字幕才用 faster-whisper 在本機轉文字；中文轉繁體；抓作者章節；支援播放清單、本機影音檔、讀剪貼簿網址。
 - 「產生逐字稿」自動複製網址，並自動帶入小程式產生的字幕檔（選一次 transcriber/output 資料夾）。
