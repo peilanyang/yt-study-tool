@@ -26,6 +26,7 @@ export function parseSubtitles(txt) {
     if (lm) { out.push({ t: toSec(lm[1]), text: lm[2] }); t = null; continue; }
     const clean = l.replace(/<[^>]+>/g, '').trim();
     if (!clean) continue;
+    if (t === null && !out.length) continue; // 第一個時間之前多複製到的網頁文字，略過
     if (t === null && out.length) {
       const last = out[out.length - 1];
       if (last.text !== clean) last.text += ' ' + clean;

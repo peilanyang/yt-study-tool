@@ -33,3 +33,7 @@ test('groupRaw 依 20 秒分段，第一段為文章段落開頭', () => {
   assert.equal(g[0].para, true);
   assert.equal(g[1].para, false);
 });
+
+test('第一個時間之前多複製到的文字會略過', () => {
+  assert.deepEqual(parseSubtitles('轉錄稿\n搜尋轉錄稿\n0:00\nhello\n0:03\nworld'), [{ t: 0, text: 'hello' }, { t: 3, text: 'world' }]);
+});

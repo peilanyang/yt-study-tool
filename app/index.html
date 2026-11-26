@@ -146,7 +146,13 @@
     </ol>
     <section class="step" id="step1">
       <h3>步驟 1：取得字幕</h3>
-      <p class="hint">在 YouTube 影片下方說明欄按「…更多」→「顯示轉錄稿」，全選複製後貼到下面（含時間）；或上傳 .srt / .vtt 字幕檔。之後的版本會由 Windows 小程式自動取得。</p>
+      <ol class="howto">
+        <li><a id="ytOpen" href="#" target="_blank" rel="noopener noreferrer">在 YouTube 打開這部影片 ↗</a></li>
+        <li>影片下方說明欄按「…更多」，往下捲到「轉錄稿」，按「顯示轉錄稿」。</li>
+        <li>右側出現「時間＋文字」：用滑鼠從第一行<b>拖曳</b>選到最後一行，按 <kbd>Ctrl</kbd>+<kbd>C</kbd>（不要用 Ctrl+A）。</li>
+        <li>回到這裡，在下面框框按 <kbd>Ctrl</kbd>+<kbd>V</kbd>。</li>
+      </ol>
+      <p class="hint">找不到「顯示轉錄稿」代表影片沒有字幕，之後可用 Windows 小程式處理。也可以直接上傳 .srt / .vtt 字幕檔。</p>
       <textarea id="rawIn" rows="7" placeholder="0:00&#10;Hello everyone, welcome back…"></textarea>
       <div class="row"><input type="file" id="subFile" accept=".srt,.vtt,.txt"><span class="hint" id="rawInfo"></span></div>
     </section>

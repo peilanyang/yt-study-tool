@@ -144,3 +144,4 @@ dialog::backdrop { background: #0008; }
 #lbImg { max-width: 100%; max-height: 72vh; border-radius: 6px; }
 #toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: #222; color: #fff; padding: 8px 14px; border-radius: 8px; opacity: 0; transition: opacity .2s; z-index: 99; pointer-events: none; max-width: 90vw; }
 #toast.on { opacity: 1; }
+.howto { margin: 0; padding-left: 22px; font-size: 13.5px; line-height: 1.9; }

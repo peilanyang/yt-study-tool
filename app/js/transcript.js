@@ -202,6 +202,7 @@ export function openGen() {
   $('#rawIn').value = ''; $('#jsonIn').value = ''; $('#subFile').value = '';
   $('#rawInfo').textContent = ''; $('#jsonInfo').textContent = '';
   setHtml($('#parts'), html`<span class="hint">完成步驟 1 後，這裡會出現「複製提示詞」按鈕。</span>`);
+  $('#ytOpen').href = `https://www.youtube.com/watch?v=${v.ytId}`;
   setStep(1);
   $('#dlgGen').showModal();
 }
@@ -217,7 +218,8 @@ function setStep(n) {
 
 function updateRaw() {
   raw = parseSubtitles($('#rawIn').value);
-  $('#rawInfo').textContent = raw.length ? `辨識到 ${raw.length} 行，長度約 ${fmt(raw[raw.length - 1].t)}` : '';
+  const typed = $('#rawIn').value.trim();
+  $('#rawInfo').textContent = raw.length ? `✓ 辨識到 ${raw.length} 行，長度約 ${fmt(raw[raw.length - 1].t)}` : typed ? '沒有辨識到時間。請確認複製的內容有包含「0:00」這類時間。' : '';
   if (!raw.length) { setStep(1); return; }
   parts = chunk(raw, PART_LINES);
   setHtml($('#parts'), parts.map((p, i) => html`<button class="primary" data-part="${i}">複製提示詞${parts.length > 1 ? `（第 ${i + 1} / ${parts.length} 份，${fmt(p[0].t)} 起）` : ''}</button>`));
