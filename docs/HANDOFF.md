@@ -13,7 +13,7 @@ YouTube 教學影片學習工具：貼網址 → 取得逐字稿（標點、分�
 - 階段：**2 開發**。關卡 G1（文件定稿）已於 2026-11-26 通過。
 - 仍待使用者確認：需求規格第 9 節 NFR-02、NFR-07 的「建議值」（可在驗收時依實測調整）。
 - Git：完成。GitHub 公開儲存庫 https://github.com/peilanyang/yt-study-tool ；使用者專案資料夾已是它的本機複本（main 追蹤 origin/main）。
-- 程式碼：尚未開始，下一個任務是 T04（v1 拆成 ES Modules、加 start.bat）。
+- 程式碼：T04 完成於分支 `feature/t04-modules`（等使用者在 Windows 試用後合併到 main）。下一個任務 T05（Windows 小程式）。
 - v1 舊版工具：`legacy/yt-study-v1.html`（單一 HTML，可用但不再擴充）。
 
 ## 3. 重要連結與位置
