@@ -78,3 +78,8 @@ test('Markdown 匯出含時間連結、講者與翻譯', () => {
   assert.match(md, /主持人：a/);
   assert.match(md, /> 甲/);
 });
+
+test('作者章節經過整理保留', () => {
+  const s = normalizeState({ videos: { v: { ytId: 'dQw4w9WgXcQ', authorChapters: [{ t: '3', title: 'A' }, { t: 1 }, null] } } });
+  assert.deepEqual(s.videos.v.authorChapters, [{ t: 3, title: 'A' }]);
+});

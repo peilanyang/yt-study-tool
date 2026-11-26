@@ -25,10 +25,19 @@
 
 請用電腦版 Chrome 或 Edge。直接雙擊 `app/index.html` 無法播放 YouTube（錯誤 153）。
 
+## 字幕小程式（Windows）
+
+在 `transcriber/`：有字幕的影片直接抓字幕，沒有字幕就在電腦上語音轉文字，輸出 `.srt` 給學習工具自動帶入。
+
+1. 第一次：雙擊 `transcriber\install.bat`（需 Python 3.11 以上，約 10 分鐘）。
+2. 之後：在學習工具按「產生逐字稿」（網址會自動複製）→ 雙擊 `transcriber\transcribe.bat` → 按 Enter。
+
+詳細說明見 `transcriber/使用說明.txt`。
+
 ## 開發
 
 - 程式在 `app/`（原生 ES Modules，不需建置）。
-- 單元測試：`node --test tests/js/*.test.mjs`
+- 單元測試：`node --test tests/js/*.test.mjs`、`python -m pytest tests/py`
 - 分支、Commit、版本規則見 `docs/05-Git版本管理規範.md`。
 
 ## 舊版

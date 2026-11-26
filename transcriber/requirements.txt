@@ -1,0 +1,4 @@
+# 版本鎖定（架構文件第 4 節）；升級需走變更流程，yt-dlp 例外可先升級後補記錄
+yt-dlp[default]==2026.11.23
+faster-whisper==1.2.1
+opencc-python-reimplemented==0.1.7

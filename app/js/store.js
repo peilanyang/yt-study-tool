@@ -49,7 +49,12 @@ export async function flush() {
   await tx('kv', 'readwrite', (st) => st.put(s, 'state'));
 }
 // 關閉分頁前盡量寫入
-addEventListener('pagehide', () => { if (pending) flush(); });
+if (typeof addEventListener === 'function') addEventListener('pagehide', () => { if (pending) flush(); });
+
+export const kv = {
+  get: (k) => tx('kv', 'readonly', (s) => s.get(k)),
+  set: (k, v) => tx('kv', 'readwrite', (s) => s.put(v, k)),
+};
 
 export const shots = {
   get: (id) => tx('shots', 'readonly', (s) => s.get(id)),

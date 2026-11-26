@@ -49,6 +49,9 @@ export function normalizeState(input) {
         created: Number(n.created) || now,
         updatedAt: Number(n.updatedAt) || Number(n.created) || now,
       })),
+      authorChapters: (Array.isArray(v.authorChapters) ? v.authorChapters : [])
+        .filter((c) => c && typeof c.title === 'string')
+        .map((c) => ({ t: Math.max(0, Number(c.t) || 0), title: c.title.slice(0, 200) })),
       added: Number(v.added) || now,
       updatedAt: Number(v.updatedAt) || now,
     };
@@ -81,7 +84,7 @@ export function normalizeState(input) {
 
 export function newVideo(ytIdValue, mode) {
   const now = Date.now();
-  return { id: uid(), ytId: ytIdValue, title: '', mode, speakers: { A: '講者 A', B: '講者 B' }, segs: [], notes: [], added: now, updatedAt: now };
+  return { id: uid(), ytId: ytIdValue, title: '', mode, speakers: { A: '講者 A', B: '講者 B' }, segs: [], notes: [], authorChapters: [], added: now, updatedAt: now };
 }
 
 /** 加入影片到清單；同一部影片已存在就沿用。回傳影片 id。 */

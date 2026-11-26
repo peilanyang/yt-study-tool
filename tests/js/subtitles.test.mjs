@@ -37,3 +37,10 @@ test('groupRaw 依 20 秒分段，第一段為文章段落開頭', () => {
 test('第一個時間之前多複製到的文字會略過', () => {
   assert.deepEqual(parseSubtitles('轉錄稿\n搜尋轉錄稿\n0:00\nhello\n0:03\nworld'), [{ t: 0, text: 'hello' }, { t: 3, text: 'world' }]);
 });
+
+import { parseChapters } from '../../app/js/subtitles.js';
+test('parseChapters 只保留合法欄位並排序', () => {
+  assert.deepEqual(parseChapters('[{"t":146.2,"title":" IPO "},{"t":0,"title":"開場"},{"t":5},{"title":""}]'), [{ t: 0, title: '開場' }, { t: 146.2, title: 'IPO' }]);
+  assert.deepEqual(parseChapters('not json'), []);
+  assert.deepEqual(parseChapters('{"a":1}'), []);
+});

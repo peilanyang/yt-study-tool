@@ -5,6 +5,7 @@ import { parseSubtitles, groupRaw } from './subtitles.js';
 import { PART_LINES, chunk, buildOrganizePrompt, buildTranslatePrompt, parseOrganizeReply, parseTranslateReply } from './claude.js';
 import { segIndexAt } from './model.js';
 import * as player from './player.js';
+import * as outdir from './outputdir.js';
 
 const COLORS = { A: 'var(--A)', B: 'var(--B)', C: 'var(--C)', D: 'var(--D)' };
 const ORDER = ['A', 'B', 'C', 'D', ''];
@@ -159,6 +160,8 @@ function followPlayback() {
 let raw = [];
 let collected = [];
 let parts = [];
+let pendingChapters = [];
+let pollTimer = null;
 
 function initGenDialog() {
   const dlg = $('#dlgGen');
@@ -189,6 +192,11 @@ function initGenDialog() {
     if (!collected.length) { toast('還沒有加入 Claude 的回覆'); return; }
     commit(collected);
   });
+  $('#bPickOut').addEventListener('click', async () => {
+    try { await outdir.choose(); await refreshAuto(); } catch { /* 使用者取消 */ }
+  });
+  $('#bRegrant').addEventListener('click', async () => { await outdir.regrant(); await refreshAuto(); });
+  dlg.addEventListener('close', () => { clearInterval(pollTimer); pollTimer = null; });
   $('#bRawOnly').addEventListener('click', () => {
     if (!raw.length) { toast('請先在步驟 1 貼上字幕'); return; }
     commit(groupRaw(raw));
@@ -198,13 +206,49 @@ function initGenDialog() {
 export function openGen() {
   const v = ctx.cur();
   if (!v) { toast('請先選擇影片'); return; }
-  raw = []; collected = []; parts = [];
+  raw = []; collected = []; parts = []; pendingChapters = [];
   $('#rawIn').value = ''; $('#jsonIn').value = ''; $('#subFile').value = '';
   $('#rawInfo').textContent = ''; $('#jsonInfo').textContent = '';
   setHtml($('#parts'), html`<span class="hint">完成步驟 1 後，這裡會出現「複製提示詞」按鈕。</span>`);
-  $('#ytOpen').href = `https://www.youtube.com/watch?v=${v.ytId}`;
+  const url = `https://www.youtube.com/watch?v=${v.ytId}`;
+  $('#ytOpen').href = url;
   setStep(1);
   $('#dlgGen').showModal();
+  navigator.clipboard.writeText(url).then(
+    () => { $('#copyState').textContent = '✓ 影片網址已複製。'; },
+    () => { $('#copyState').textContent = `請先複製影片網址（${url}）。`; },
+  );
+  refreshAuto();
+}
+
+/** 小程式資料夾的狀態與輪詢：每 3 秒找一次這部影片的字幕檔 */
+async function refreshAuto() {
+  clearInterval(pollTimer); pollTimer = null;
+  const st = await outdir.status();
+  $('#autoBox').hidden = st === 'unsupported';
+  if (st === 'unsupported') { $('#manualBox').open = true; return; }
+  $('#bPickOut').hidden = st !== 'none';
+  $('#bRegrant').hidden = st !== 'prompt';
+  if (st === 'none') { $('#autoStatus').textContent = '第一次使用：請選專案資料夾裡的 transcriber\\output，之後會自動帶入。'; return; }
+  if (st === 'prompt') { $('#autoStatus').textContent = `瀏覽器需要你再允許一次讀取「${await outdir.folderName()}」。`; return; }
+  $('#autoStatus').textContent = '⏳ 等待字幕檔…（小程式完成後會自動帶入）';
+  const check = async () => {
+    const v = ctx.cur();
+    if (!v || raw.length) return;
+    try {
+      const found = await outdir.findSubtitle(v.ytId);
+      if (!found) return;
+      clearInterval(pollTimer); pollTimer = null;
+      $('#rawIn').value = found.srt;
+      pendingChapters = found.chapters;
+      updateRaw();
+      $('#autoStatus').textContent = `✓ 已自動帶入：${found.name}${found.chapters.length ? `（含作者章節 ${found.chapters.length} 個）` : ''}`;
+    } catch (e) {
+      $('#autoStatus').textContent = '讀取字幕資料夾失敗：' + e.message;
+    }
+  };
+  await check();
+  if (!raw.length) pollTimer = setInterval(check, 3000);
 }
 
 function setStep(n) {
@@ -246,6 +290,7 @@ function commit(segs) {
   if (v.segs.length && !confirm('取代這部影片原本的逐字稿？（筆記與截圖不受影響）')) return;
   v.segs = segs;
   v.mode = 'transcript';
+  if (pendingChapters.length) v.authorChapters = pendingChapters;
   for (const k of new Set(segs.map((s) => s.sp))) if (k && !v.speakers[k]) v.speakers[k] = '講者 ' + k;
   ctx.touch();
   $('#dlgGen').close();
