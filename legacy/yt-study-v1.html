@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>YouTube 教學影片學習筆記</title>
+<style>
+:root{--bg:#f6f5f2;--panel:#fff;--ink:#1f2328;--mute:#6b7076;--line:#e3e1dc;--acc:#c2410c;--acc2:#fff1e8;--A:#2563eb;--B:#16a34a;--C:#9333ea;--D:#b45309}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 10px}
+button:hover{border-color:#bbb}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+button.ghost{border-color:transparent;background:transparent;padding:2px 6px}
+button.ghost:hover{background:#0000000d}
+input[type=text],input[type=password],textarea,select{border:1px solid var(--line);border-radius:7px;padding:5px 8px;background:#fff}
+textarea{width:100%;resize:vertical}
+header{height:48px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+header h1{font-size:15px;margin:0;font-weight:650}
+header .sp{flex:1}
+#app{display:grid;grid-template-columns:270px 1fr;height:calc(100% - 48px)}
+#app.nosb{grid-template-columns:0 1fr}
+#side{border-right:1px solid var(--line);background:var(--panel);overflow:auto;padding:10px}
+#app.nosb #side{display:none}
+.pl{margin-bottom:10px;border:1px solid var(--line);border-radius:9px}
+.plh{display:flex;align-items:center;gap:4px;padding:6px 8px;background:#faf9f7;border-radius:9px 9px 0 0;font-weight:600}
+.plh .n{flex:1;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vi{display:flex;align-items:center;gap:4px;padding:5px 8px;border-top:1px solid var(--line);cursor:pointer}
+.vi:hover{background:#faf9f7}
+.vi.on{background:var(--acc2)}
+.vi .t{flex:1;font-size:13px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.vi .acts{display:none;gap:0}
+.vi:hover .acts,.vi.on .acts{display:flex}
+.vi .acts button{padding:0 4px;font-size:12px}
+.addv{display:flex;gap:4px;padding:6px 8px;border-top:1px solid var(--line)}
+.addv input{flex:1;min-width:0;font-size:12px}
+#main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(340px,1fr);gap:12px;padding:12px;overflow:hidden;min-height:0}
+@media (max-width:1100px){#main{grid-template-columns:1fr;overflow:auto}#panel{min-height:600px}}
+#left{display:flex;flex-direction:column;gap:8px;min-height:0;overflow:auto}
+#playerWrap{position:relative;width:100%;aspect-ratio:16/9;background:#111;border-radius:10px;overflow:hidden}
+#playerWrap iframe,#player{position:absolute;inset:0;width:100%;height:100%;border:0}
+#empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#aaa;text-align:center;padding:20px}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .25s}
+.ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ctl .tm{font-variant-numeric:tabular-nums;color:var(--mute);min-width:60px}
+#vtitle{font-weight:650;font-size:16px}
+#capState{font-size:12px;color:var(--mute)}
+#capState.on{color:#16a34a}
+#panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.tabs{display:flex;border-bottom:1px solid var(--line)}
+.tabs button{border:0;border-radius:0;background:none;padding:10px 14px;border-bottom:2px solid transparent}
+.tabs button.on{border-bottom-color:var(--acc);color:var(--acc);font-weight:600}
+.tb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px}
+.body{flex:1;overflow:auto;padding:6px 10px 40px}
+.seg{display:grid;grid-template-columns:52px 1fr;gap:6px;padding:7px 6px;border-radius:7px}
+.seg.cur{background:var(--acc2)}
+.seg .ts{font-size:12px;color:var(--acc);cursor:pointer;font-variant-numeric:tabular-nums;padding-top:2px}
+.seg .ts:hover{text-decoration:underline}
+.chip{display:inline-block;font-size:11px;font-weight:700;color:#fff;border-radius:10px;padding:0 7px;margin-right:6px;cursor:pointer;vertical-align:1px;user-select:none}
+.seg .o{white-space:pre-wrap}
+.seg .z{color:#44505c;margin-top:2px;white-space:pre-wrap}
+.seg .tools{display:none;font-size:12px;margin-top:2px}
+.seg:hover .tools{display:block}
+.seg [contenteditable=true]{outline:2px solid var(--acc);border-radius:4px;background:#fff}
+mark{background:#fde68a}
+.note{border:1px solid var(--line);border-radius:9px;padding:8px;margin:8px 0;background:#fff}
+.note .h{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--mute)}
+.note .h .ts{color:var(--acc);cursor:pointer;font-weight:600}
+.note .tx{white-space:pre-wrap;min-height:22px;padding:3px 4px;border-radius:5px;margin-top:4px}
+.note .tx:empty::before{content:"（點這裡輸入說明）";color:#aaa}
+.note .tx:focus{outline:2px solid var(--acc);background:#fffdf9}
+.note img{max-width:100%;border-radius:6px;margin-top:6px;cursor:zoom-in;border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;padding-top:6px}
+.grid figure{margin:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;cursor:zoom-in;background:#fff}
+.grid img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+.grid figcaption{font-size:12px;padding:3px 6px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal.on{display:flex}
+.box{background:#fff;border-radius:12px;max-width:760px;width:100%;max-height:92vh;overflow:auto;padding:18px}
+.box h3{margin:0 0 10px}
+.box .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.hint{font-size:12.5px;color:var(--mute)}
+.parts{display:flex;flex-wrap:wrap;gap:6px}
+#lb .box{max-width:1200px;padding:10px;text-align:center}
+#lb img{max-width:100%;max-height:75vh;border-radius:6px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:8px;opacity:0;transition:opacity .2s;z-index:99;pointer-events:none}
+#toast.on{opacity:1}
+#fileWarn{display:none;background:#fef3c7;border-bottom:1px solid #f59e0b55;padding:6px 14px;font-size:13px}
+.kbd{font-size:11px;border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--mute)}
+.spk{display:flex;align-items:center;gap:3px}
+.spk input{width:84px;padding:2px 6px;font-size:12px}
+</style>
+</head>
+<body>
+<div id="fileWarn">⚠️ 你是直接用「檔案」開啟這個頁面。若影片顯示「錯誤 153」無法播放，請改用本機伺服器或上傳到網站空間開啟（見使用說明）。</div>
+<header>
+  <button class="ghost" id="tglSide" title="顯示/隱藏播放清單">☰</button>
+  <h1>📺 教學影片學習筆記</h1>
+  <span class="sp"></span>
+  <button id="btnExportMd" title="把目前影片的逐字稿與筆記匯出成 Markdown">匯出筆記 .md</button>
+  <button id="btnBackup">備份</button>
+  <button id="btnRestore">還原</button>
+  <button id="btnSettings">⚙︎ 設定</button>
+  <input type="file" id="restoreFile" accept=".json" hidden>
+</header>
+<div id="app">
+  <aside id="side">
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <input type="text" id="newPl" placeholder="新播放清單名稱" style="flex:1;min-width:0">
+      <button class="pri" id="btnNewPl">＋</button>
+    </div>
+    <div id="pls"></div>
+  </aside>
+  <section id="main">
+    <div id="left">
+      <div id="playerWrap"><div id="player"></div><div id="empty">在左側播放清單貼上 YouTube 連結，加入影片後點選即可開始</div><div id="flash"></div></div>
+      <div class="ctl">
+        <button id="bBack" title="倒退 5 秒（←）">⏪ 5s</button>
+        <button id="bPlay" title="播放/暫停（空白鍵）">⏯</button>
+        <button id="bFwd" title="快轉 5 秒（→）">5s ⏩</button>
+        <select id="rate" title="播放速度">
+          <option>0.5</option><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option><option>1.75</option><option>2</option>
+        </select>
+        <span class="tm" id="tm">0:00</span>
+        <span style="flex:1"></span>
+        <button class="pri" id="bShot" title="截取影片畫面（S）">📷 截圖 <span class="kbd" style="color:#fff;border-color:#fff8">S</span></button>
+        <button id="bNote" title="在目前時間加筆記（N）">📝 筆記 <span class="kbd">N</span></button>
+      </div>
+      <div class="ctl"><span id="vtitle"></span></div>
+      <div class="ctl"><span id="capState">截圖功能：第一次按 📷 時，瀏覽器會詢問要分享哪個畫面，請選「這個分頁」。之後同一次開啟期間都不必再選。</span><button class="ghost" id="bStopCap" style="display:none">停止分享</button></div>
+    </div>
+    <div id="panel">
+      <div class="tabs">
+        <button data-tab="tr" class="on">逐字稿</button>
+        <button data-tab="nt">筆記 <span id="ntCount"></span></button>
+        <button data-tab="sh">截圖 <span id="shCount"></span></button>
+      </div>
+      <div id="tab-tr" style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <div class="tb">
+          <button class="pri" id="bImport">＋ 匯入／產生逐字稿</button>
+          <select id="view" title="顯示方式"><option value="bi">雙語</option><option value="o">只看原文</option><option value="z">只看中文</option></select>
+          <label><input type="checkbox" id="follow" checked> 跟隨播放</label>
+          <input type="text" id="q" placeholder="搜尋…" style="width:110px">
+        </div>
+        <div class="tb" id="spkBar"></div>
+        <div class="body" id="segs"></div>
+      </div>
+      <div id="tab-nt" style="display:none;flex-direction:column;flex:1;min-height:0">
+        <div class="tb" style="flex-direction:column;align-items:stretch">
+          <textarea id="noteIn" rows="3" placeholder="輸入筆記，Ctrl+Enter 儲存（會記下目前播放時間）"></textarea>
+          <div style="display:flex;gap:6px;align-items:center"><label><input type="checkbox" id="noteAtTime" checked> 記錄目前時間</label><span style="flex:1"></span><button id="bCopyNotes">複製全部筆記</button><button class="pri" id="bAddNote">儲存筆記</button></div>
+        </div>
+        <div class="body" id="notes"></div>
+      </div>
+      <div id="tab-sh" style="display:none;flex-direction:column;flex:1;min-height:0">
+        <div class="tb"><span class="hint">截圖會依時間排序；點圖放大，可下載、複製或加上說明。</span></div>
+        <div class="body"><div class="grid" id="shots"></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Import modal -->
+<div class="modal" id="mImport"><div class="box">
+  <h3>匯入／產生逐字稿</h3>
+  <div class="hint">① 在 YouTube 影片下方說明欄點「…更多」→「顯示轉錄稿」，全選右側轉錄稿文字複製後貼到下面（含時間）。也可以上傳 .srt / .vtt 字幕檔。</div>
+  <textarea id="rawIn" rows="9" placeholder="0:00&#10;Hello everyone, welcome back...&#10;0:04&#10;today we're going to..."></textarea>
+  <div class="row"><input type="file" id="subFile" accept=".srt,.vtt,.txt"><span class="hint" id="rawInfo"></span></div>
+  <div class="hint" style="margin-top:6px">② 選擇整理方式（加標點、分段、標記 A/B 講者、外語附中文翻譯）：</div>
+  <div class="row">
+    <button class="pri" id="bApi">用 Claude API 自動整理</button>
+    <button id="bCopyMode">複製提示詞，貼到 Claude 對話</button>
+    <button id="bRawOnly">不整理，直接匯入</button>
+  </div>
+  <div id="apiProg" class="hint"></div>
+  <div id="copyArea" style="display:none;border-top:1px solid var(--line);margin-top:8px;padding-top:8px">
+    <div class="hint">依序按「複製第 N 部分」，貼到 Claude 對話中送出，再把 Claude 回覆的 JSON 貼到下方按「加入」。全部加入後按「完成」。</div>
+    <div class="parts" id="parts" style="margin:8px 0"></div>
+    <textarea id="jsonIn" rows="6" placeholder='把 Claude 回覆的 JSON 貼到這裡，例如 [{"t":0,"sp":"A","text":"...","zh":"..."}]'></textarea>
+    <div class="row"><button id="bAddJson">加入</button><span class="hint" id="jsonInfo"></span></div>
+  </div>
+  <div class="row" style="justify-content:space-between;border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
+    <label class="hint"><input type="checkbox" id="replaceOld" checked> 取代這部影片原本的逐字稿</label>
+    <span><button id="bCloseImport">取消</button> <button class="pri" id="bDoneImport">完成</button></span>
+  </div>
+</div></div>
+
+<!-- Settings modal -->
+<div class="modal" id="mSet"><div class="box">
+  <h3>設定</h3>
+  <div class="hint">填入 Anthropic API 金鑰後，可以在工具裡一鍵自動整理逐字稿（需付 API 費用）。金鑰只存在這台電腦的瀏覽器裡。沒有金鑰也能用「複製提示詞」的方式免費整理。</div>
+  <div class="row"><label style="width:90px">API 金鑰</label><input type="password" id="sKey" style="flex:1" placeholder="sk-ant-..."></div>
+  <div class="row"><label style="width:90px">模型</label><input type="text" id="sModel" style="flex:1"></div>
+  <div class="row"><label style="width:90px">翻譯成</label><select id="sLang"><option value="繁體中文（台灣用語）">繁體中文（台灣）</option><option value="简体中文">简体中文</option></select></div>
+  <div class="row" style="justify-content:flex-end"><button id="bCloseSet">取消</button><button class="pri" id="bSaveSet">儲存</button></div>
+</div></div>
+
+<!-- Lightbox -->
+<div class="modal" id="lb"><div class="box">
+  <img id="lbImg" alt="">
+  <div class="row" style="justify-content:center">
+    <span id="lbTime" class="hint"></span>
+    <button id="lbSeek">跳到這個時間</button>
+    <button id="lbCopy">複製圖片</button>
+    <button id="lbDl">下載 PNG</button>
+    <button id="lbDel">刪除</button>
+    <button class="pri" id="lbClose">關閉</button>
+  </div>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+/* ============ storage (IndexedDB) ============ */
+const DBN='ytStudy', ST='kv', SH='shots';
+let idb;
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DBN,1);r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore(ST);d.createObjectStore(SH)};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function tx(store,mode,fn){return new Promise((res,rej)=>{const t=idb.transaction(store,mode);const s=t.objectStore(store);const r=fn(s);t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error)})}
+const kvGet=k=>tx(ST,'readonly',s=>s.get(k));
+const kvSet=(k,v)=>tx(ST,'readwrite',s=>s.put(v,k));
+const shotGet=k=>tx(SH,'readonly',s=>s.get(k));
+const shotSet=(k,v)=>tx(SH,'readwrite',s=>s.put(v,k));
+const shotDel=k=>tx(SH,'readwrite',s=>s.delete(k));
+const shotKeys=()=>tx(SH,'readonly',s=>s.getAllKeys());
+
+let S={playlists:[],videos:{},current:null,settings:{apiKey:'',model:'claude-sonnet-5-5',lang:'繁體中文（台灣用語）',view:'bi'}};
+let saveT;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>kvSet('state',S).catch(e=>toast('儲存失敗：'+e.message)),300)}
+
+/* ============ helpers ============ */
+const $=id=>document.getElementById(id);
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmt(t){t=Math.max(0,Math.floor(t||0));const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s).padStart(2,'0')}
+function toast(m){const e=$('toast');e.textContent=m;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2200)}
+function ytId(u){u=u.trim();if(/^[\w-]{11}$/.test(u))return u;const m=u.match(/(?:v=|youtu\.be\/|shorts\/|embed\/|live\/)([\w-]{11})/);return m?m[1]:null}
+function cur(){return S.current&&S.videos[S.current]}
+function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)}
+const SPK_COLORS={A:'var(--A)',B:'var(--B)',C:'var(--C)',D:'var(--D)'};
+function confirmBox(msg){return window.confirm(msg)}
+
+/* ============ playlists / sidebar ============ */
+function renderSide(){
+  const el=$('pls');
+  if(!S.playlists.length){el.innerHTML='<div class="hint">先建立一個播放清單，例如「Excel 教學」。</div>';return}
+  const plOpts=S.playlists.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  el.innerHTML=S.playlists.map((p,pi)=>`
+   <div class="pl" data-pl="${p.id}">
+     <div class="plh"><span class="n" data-act="togglePl" title="${esc(p.name)}">${p.collapsed?'▸':'▾'} ${esc(p.name)} <span class="hint">(${p.videos.length})</span></span>
+       <button class="ghost" data-act="plUp" title="上移">↑</button>
+       <button class="ghost" data-act="plRen" title="重新命名">✎</button>
+       <button class="ghost" data-act="plDel" title="刪除清單">🗑</button></div>
+     ${p.collapsed?'':p.videos.map((vid,vi)=>{const v=S.videos[vid];if(!v)return'';const n=v.notes.length;return`
+       <div class="vi ${vid===S.current?'on':''}" data-v="${vid}">
+         <span class="t" data-act="open">${esc(v.title||v.ytId)}${v.segs.length?' <span class="hint">📄</span>':''}${n?` <span class="hint">📝${n}</span>`:''}</span>
+         <span class="acts">
+           <button class="ghost" data-act="vUp" title="上移">↑</button>
+           <button class="ghost" data-act="vDown" title="下移">↓</button>
+           <button class="ghost" data-act="vRen" title="改名">✎</button>
+           <select data-act="vMove" title="移到其他清單" style="width:22px;padding:0;border:0;background:none"><option value="">⇄</option>${plOpts}</select>
+           <button class="ghost" data-act="vDel" title="從清單移除">✕</button>
+         </span></div>`}).join('')}
+     ${p.collapsed?'':`<div class="addv"><input type="text" placeholder="貼上 YouTube 連結（可多個，空白分隔）" data-add="${p.id}"><button data-act="addV">加入</button></div>`}
+   </div>`).join('');
+}
+$('btnNewPl').onclick=()=>{const n=$('newPl').value.trim()||'新播放清單';S.playlists.push({id:uid(),name:n,videos:[]});$('newPl').value='';save();renderSide()};
+$('newPl').onkeydown=e=>{if(e.key==='Enter')$('btnNewPl').click()};
+$('pls').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset.add){e.target.nextElementSibling.click()}});
+$('pls').addEventListener('change',e=>{const t=e.target;if(t.dataset.act==='vMove'&&t.value){const vid=t.closest('.vi').dataset.v,from=S.playlists.find(p=>p.id===t.closest('.pl').dataset.pl),to=S.playlists.find(p=>p.id===t.value);if(to&&from!==to){from.videos=from.videos.filter(x=>x!==vid);if(!to.videos.includes(vid))to.videos.push(vid);save();renderSide();toast('已移到「'+to.name+'」')}else t.value=''}});
+$('pls').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b||b.tagName==='SELECT')return;
+  const act=b.dataset.act,plEl=b.closest('.pl'),p=plEl&&S.playlists.find(x=>x.id===plEl.dataset.pl),viEl=b.closest('.vi'),vid=viEl&&viEl.dataset.v;
+  const i=p?S.playlists.indexOf(p):-1;
+  if(act==='togglePl'){p.collapsed=!p.collapsed}
+  else if(act==='plUp'&&i>0){[S.playlists[i-1],S.playlists[i]]=[S.playlists[i],S.playlists[i-1]]}
+  else if(act==='plRen'){const n=window.prompt('播放清單名稱',p.name);if(n)p.name=n.trim()}
+  else if(act==='plDel'){if(!confirmBox(`刪除播放清單「${p.name}」？\n（影片若不在其他清單中，其逐字稿與筆記也會一起刪除）`))return;S.playlists.splice(i,1);p.videos.forEach(v=>maybeDropVideo(v))}
+  else if(act==='addV'){const inp=plEl.querySelector('input[data-add]');const ids=inp.value.split(/\s+/).map(ytId).filter(Boolean);if(!ids.length){toast('看不出是 YouTube 連結');return}
+    let first;ids.forEach(y=>{let v=Object.values(S.videos).find(x=>x.ytId===y);if(!v){v={id:uid(),ytId:y,title:'',segs:[],notes:[],speakers:{A:'講者 A',B:'講者 B'},added:Date.now()};S.videos[v.id]=v}if(!p.videos.includes(v.id))p.videos.push(v.id);first=first||v.id});inp.value='';save();renderSide();openVideo(first);return}
+  else if(act==='open'){openVideo(vid);return}
+  else if(act==='vUp'||act==='vDown'){const j=p.videos.indexOf(vid),k=act==='vUp'?j-1:j+1;if(k<0||k>=p.videos.length)return;[p.videos[j],p.videos[k]]=[p.videos[k],p.videos[j]]}
+  else if(act==='vRen'){const v=S.videos[vid];const n=window.prompt('影片名稱',v.title);if(n)v.title=n.trim();if(vid===S.current)$('vtitle').textContent=v.title}
+  else if(act==='vDel'){if(!confirmBox('從這個清單移除這部影片？'))return;p.videos=p.videos.filter(x=>x!==vid);maybeDropVideo(vid)}
+  save();renderSide();
+});
+function maybeDropVideo(vid){if(S.playlists.some(p=>p.videos.includes(vid)))return;const v=S.videos[vid];if(v)v.notes.forEach(n=>n.shotId&&shotDel(n.shotId));delete S.videos[vid];if(S.current===vid){S.current=null;renderAll()}}
+$('tglSide').onclick=()=>$('app').classList.toggle('nosb');
+
+/* ============ YouTube player ============ */
+let player,playerReady=false,pendingVid=null;
+window.onYouTubeIframeAPIReady=()=>{player=new YT.Player('player',{width:'100%',height:'100%',playerVars:{rel:0,modestbranding:1,playsinline:1,origin:location.origin!=='null'?location.origin:undefined},events:{onReady:()=>{playerReady=true;if(pendingVid){const v=S.videos[pendingVid];pendingVid=null;if(v)player.cueVideoById(v.ytId)}},onStateChange:onState,onError:e=>toast('播放器錯誤 '+e.data+(e.data===153?'：請用本機伺服器開啟此頁':''))}})};
+(function(){const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s)})();
+function onState(){const v=cur();if(!v||!player.getVideoData)return;const d=player.getVideoData();if(d&&d.title&&!v.title){v.title=d.title;$('vtitle').textContent=v.title;save();renderSide()}}
+function openVideo(vid){
+  const v=S.videos[vid];if(!v)return;S.current=vid;save();
+  $('empty').style.display='none';
+  if(playerReady)player.cueVideoById(v.ytId);else pendingVid=vid;
+  renderAll();
+}
+const now=()=>playerReady&&player.getCurrentTime?player.getCurrentTime():0;
+function seek(t){if(!playerReady)return;player.seekTo(Math.max(0,t),true);if(player.getPlayerState()!==1)player.playVideo()}
+$('bBack').onclick=()=>playerReady&&player.seekTo(Math.max(0,now()-5),true);
+$('bFwd').onclick=()=>playerReady&&player.seekTo(now()+5,true);
+$('bPlay').onclick=togglePlay;
+function togglePlay(){if(!playerReady)return;player.getPlayerState()===1?player.pauseVideo():player.playVideo()}
+$('rate').onchange=e=>playerReady&&player.setPlaybackRate(+e.target.value);
+
+/* time loop: highlight current segment */
+let lastIdx=-1;
+setInterval(()=>{if(!playerReady||!cur())return;const t=now();$('tm').textContent=fmt(t);const segs=cur().segs;if(!segs.length)return;
+  let i=-1;for(let k=0;k<segs.length;k++){if(segs[k].t<=t+0.3)i=k;else break}
+  if(i!==lastIdx){const box=$('segs');box.querySelector('.seg.cur')?.classList.remove('cur');const el=box.querySelector(`.seg[data-i="${i}"]`);if(el){el.classList.add('cur');if($('follow').checked&&player.getPlayerState()===1&&!box.querySelector('[contenteditable=true]'))el.scrollIntoView({block:'center',behavior:'smooth'})}lastIdx=i}
+},300);
+
+/* ============ transcript ============ */
+function renderSpk(){
+  const v=cur();const bar=$('spkBar');
+  if(!v||!v.segs.length){bar.style.display='none';return}
+  const used=[...new Set(v.segs.map(s=>s.sp).filter(Boolean))].sort();
+  if(!used.length){bar.style.display='none';return}
+  bar.style.display='flex';
+  bar.innerHTML='<span class="hint">講者名稱：</span>'+used.map(k=>`<span class="spk"><span class="chip" style="background:${SPK_COLORS[k]||'#666'}">${k}</span><input type="text" data-spk="${k}" value="${esc(v.speakers?.[k]||'講者 '+k)}"></span>`).join('')+'<span class="hint">（點逐字稿中的標籤可切換講者）</span>';
+}
+$('spkBar').addEventListener('change',e=>{const k=e.target.dataset.spk;if(!k)return;const v=cur();v.speakers=v.speakers||{};v.speakers[k]=e.target.value;save();renderSegs()});
+function renderSegs(){
+  const v=cur(),box=$('segs');lastIdx=-1;
+  if(!v){box.innerHTML='<p class="hint">尚未選擇影片。</p>';return}
+  if(!v.segs.length){box.innerHTML='<p class="hint" style="padding:10px">這部影片還沒有逐字稿。按上方「＋ 匯入／產生逐字稿」。</p>';return}
+  const view=S.settings.view,q=$('q').value.trim();
+  const hl=s=>{s=esc(s);if(!q)return s;return s.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>'<mark>'+m+'</mark>')};
+  let prevSp=null;
+  box.innerHTML=v.segs.map((s,i)=>{
+    if(q&&!(s.text+' '+(s.zh||'')).toLowerCase().includes(q.toLowerCase()))return'';
+    const showChip=s.sp&&(s.sp!==prevSp||q);prevSp=s.sp;
+    const chip=s.sp?`<span class="chip" data-i="${i}" style="background:${SPK_COLORS[s.sp]||'#666'};${showChip?'':'opacity:.35'}" title="點擊切換講者">${esc(v.speakers?.[s.sp]||s.sp)}</span>`:'';
+    const o=view!=='z'||!s.zh?`<div class="o" data-f="text" data-i="${i}">${chip}${hl(s.text)}</div>`:'';
+    const z=s.zh&&view!=='o'?`<div class="z" data-f="zh" data-i="${i}">${view==='z'?chip:''}${hl(s.zh)}</div>`:'';
+    return `<div class="seg" data-i="${i}"><div class="ts" data-seek="${s.t}">${fmt(s.t)}</div><div>${o}${z}<div class="tools"><button class="ghost" data-edit="${i}">✎ 修改</button><button class="ghost" data-quote="${i}">📝 引用到筆記</button><button class="ghost" data-split="${i}" title="與上一段合併">⤒ 合併上一段</button></div></div></div>`}).join('');
+}
+$('segs').addEventListener('click',e=>{
+  const v=cur();const t=e.target;
+  if(t.dataset.seek){seek(+t.dataset.seek);return}
+  if(t.classList.contains('chip')){const i=+t.dataset.i,ord=['A','B','C','D',''];const s=v.segs[i];s.sp=ord[(ord.indexOf(s.sp||'')+1)%ord.length];if(!v.speakers[s.sp]&&s.sp)v.speakers[s.sp]='講者 '+s.sp;save();renderSegs();renderSpk();return}
+  if(t.dataset.edit){const row=t.closest('.seg');row.querySelectorAll('[data-f]').forEach(el=>{el.querySelector('.chip')?.remove();const s=v.segs[+el.dataset.i];el.textContent=s[el.dataset.f];el.contentEditable=true});row.querySelector('[data-f]')?.focus();return}
+  if(t.dataset.quote){const s=v.segs[+t.dataset.quote];addNote(s.t,'「'+s.text+'」'+(s.zh?'\n'+s.zh:'')+'\n');switchTab('nt');return}
+  if(t.dataset.split){const i=+t.dataset.split;if(i===0)return;const a=v.segs[i-1],b=v.segs[i];a.text=(a.text+' '+b.text).trim();a.zh=((a.zh||'')+(b.zh||'')).trim();v.segs.splice(i,1);save();renderSegs()}
+});
+$('segs').addEventListener('focusout',e=>{const el=e.target;if(el.contentEditable!=='true')return;const v=cur(),i=+el.dataset.i;v.segs[i][el.dataset.f]=el.innerText.trim();el.contentEditable=false;save();setTimeout(()=>{if(!$('segs').querySelector('[contenteditable=true]'))renderSegs()},50)});
+$('view').onchange=e=>{S.settings.view=e.target.value;save();renderSegs()};
+$('q').oninput=renderSegs;
+
+/* ---- parsing raw subtitles ---- */
+function toSec(s){s=s.replace(',','.');const p=s.split(':').map(Number);return p.reduce((a,b)=>a*60+b,0)}
+function parseRaw(txt){
+  const lines=txt.replace(/\r/g,'').split('\n').map(l=>l.trim());const out=[];let t=null;
+  const TS=/^(\d{1,2}:)?\d{1,2}:\d{2}$/, ARROW=/^(\d{1,2}:\d{2}:\d{2}[.,]\d{3}|\d{1,2}:\d{2}[.,]\d{3})\s*-->/, LEAD=/^((?:\d{1,2}:)?\d{1,2}:\d{2})\s+(.+)$/;
+  for(let i=0;i<lines.length;i++){
+    const l=lines[i];if(!l||l==='WEBVTT'||/^(Kind|Language|NOTE)\b/.test(l))continue;
+    const am=l.match(ARROW);if(am){t=toSec(am[1]);continue}
+    if(/^\d+$/.test(l)&&lines[i+1]&&ARROW.test(lines[i+1]))continue;
+    if(TS.test(l)){t=toSec(l);continue}
+    const lm=l.match(LEAD);if(lm){out.push({t:toSec(lm[1]),text:lm[2]});t=null;continue}
+    const clean=l.replace(/<[^>]+>/g,'').trim();if(!clean)continue;
+    if(t===null&&out.length){const last=out[out.length-1];if(last.text!==clean)last.text+=' '+clean;continue}
+    out.push({t:t??0,text:clean});t=null;
+  }
+  // de-dup rolling captions (vtt auto-subs repeat lines)
+  return out.filter((x,i)=>!(i&&out[i-1].text===x.text));
+}
+let raw=[];
+function updRaw(){raw=parseRaw($('rawIn').value);$('rawInfo').textContent=raw.length?`辨識到 ${raw.length} 行，長度約 ${fmt(raw[raw.length-1].t)}`:''}
+$('rawIn').oninput=updRaw;
+$('subFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('rawIn').value=await f.text();updRaw()};
+
+function buildPrompt(lines,context){
+  const lang=S.settings.lang;
+  return `你是專業的逐字稿編輯。以下是一段 YouTube 教學影片的自動字幕，每行格式為「[秒數] 文字」。請整理成好讀的逐字稿：
+
+1. 加上正確標點符號，修正明顯的聽寫錯字（不要改變原意、不要摘要、不要省略內容），把相關的句子合併成自然段落（每段約 2–5 句，最長不超過約 60 秒）。
+2. 標記講者：若影片有兩位以上講者（例如訪談、對話、問答），依內容與語氣的轉換標記 "A"、"B"（第三位用 "C"）。只有一位講者時全部標 "A"。
+3. 若原文不是中文，在 zh 欄位提供通順自然的${lang}翻譯；若原文本來就是中文，zh 填空字串 ""。
+4. t 為該段第一行的秒數（數字）。
+${context?`\n（前文最後內容，供延續講者判斷，不要重複輸出：${context}）\n`:''}
+只輸出 JSON 陣列，不要任何說明文字或程式碼區塊標記，格式：
+[{"t":0,"sp":"A","text":"整理後的原文段落","zh":"中文翻譯"}]
+
+字幕：
+${lines.map(l=>`[${Math.round(l.t)}] ${l.text}`).join('\n')}`;
+}
+function parseJsonReply(txt){
+  txt=txt.replace(/```(json)?/g,'');const a=txt.indexOf('['),b=txt.lastIndexOf(']');if(a<0||b<a)throw new Error('找不到 JSON 陣列');
+  const arr=JSON.parse(txt.slice(a,b+1));
+  return arr.filter(x=>x&&x.text).map(x=>({t:+x.t||0,sp:String(x.sp||'A').toUpperCase().slice(0,1),text:String(x.text).trim(),zh:String(x.zh||'').trim()}));
+}
+function chunk(arr,n){const o=[];for(let i=0;i<arr.length;i+=n)o.push(arr.slice(i,i+n));return o}
+let importBuf=[];
+function openImport(){if(!cur()){toast('請先選擇一部影片');return}importBuf=[];$('apiProg').textContent='';$('copyArea').style.display='none';$('jsonInfo').textContent='';$('mImport').classList.add('on')}
+$('bImport').onclick=openImport;
+$('bCloseImport').onclick=()=>{apiAbort?.abort();$('mImport').classList.remove('on')};
+function commitImport(segs){const v=cur();segs.sort((a,b)=>a.t-b.t);v.segs=$('replaceOld').checked?segs:[...v.segs,...segs].sort((a,b)=>a.t-b.t);v.speakers=v.speakers||{};[...new Set(segs.map(s=>s.sp))].forEach(k=>{if(k&&!v.speakers[k])v.speakers[k]='講者 '+k});save();renderAll();$('mImport').classList.remove('on');toast(`已匯入 ${segs.length} 段`)}
+$('bRawOnly').onclick=()=>{if(!raw.length){toast('請先貼上字幕');return}
+  // simple grouping into ~20s paragraphs
+  const segs=[];let curS=null;raw.forEach(l=>{if(!curS||l.t-curS.t>20){curS={t:l.t,sp:'',text:l.text,zh:''};segs.push(curS)}else curS.text+=' '+l.text});commitImport(segs)};
+$('bCopyMode').onclick=()=>{if(!raw.length){toast('請先貼上字幕');return}
+  const parts=chunk(raw,300);$('copyArea').style.display='block';
+  $('parts').innerHTML=parts.map((p,i)=>`<button data-part="${i}">📋 複製第 ${i+1}/${parts.length} 部分（${fmt(p[0].t)}起）</button>`).join('');
+  $('parts').onclick=async e=>{const i=e.target.dataset.part;if(i==null)return;const prev=i>0?parts[i-1].slice(-4).map(l=>l.text).join(' '):'';try{await navigator.clipboard.writeText(buildPrompt(parts[i],prev));e.target.textContent='✓ 已複製第 '+(+i+1)+' 部分';toast('已複製，貼到 Claude 對話送出')}catch(err){toast('複製失敗，請允許剪貼簿權限')}};
+};
+$('bAddJson').onclick=()=>{try{const s=parseJsonReply($('jsonIn').value);importBuf.push(...s);$('jsonIn').value='';$('jsonInfo').textContent=`已累積 ${importBuf.length} 段。全部部分加入後按「完成」。`}catch(e){$('jsonInfo').textContent='格式錯誤：'+e.message+'（請確認貼上的是 Claude 回覆的完整 JSON）'}};
+$('bDoneImport').onclick=()=>{if($('jsonIn').value.trim())$('bAddJson').click();if(!importBuf.length){toast('還沒有加入任何整理結果');return}commitImport(importBuf)};
+let apiAbort;
+$('bApi').onclick=async()=>{
+  if(!raw.length){toast('請先貼上字幕');return}
+  if(!S.settings.apiKey){toast('請先在「設定」填入 API 金鑰，或改用複製提示詞');$('btnSettings').click();return}
+  const parts=chunk(raw,120);const res=[];apiAbort=new AbortController();
+  try{
+    for(let i=0;i<parts.length;i++){
+      $('apiProg').textContent=`整理中… 第 ${i+1}/${parts.length} 部分（請勿關閉視窗）`;
+      const prev=res.slice(-2).map(s=>`[${s.sp}] ${s.text}`).join(' ');
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',signal:apiAbort.signal,headers:{'content-type':'application/json','x-api-key':S.settings.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:S.settings.model,max_tokens:16000,messages:[{role:'user',content:buildPrompt(parts[i],prev)}]})});
+      const j=await r.json();if(!r.ok)throw new Error(j.error?.message||r.status);
+      res.push(...parseJsonReply(j.content.map(c=>c.text||'').join('')));
+    }
+    importBuf=res;commitImport(res);
+  }catch(e){if(e.name!=='AbortError')$('apiProg').textContent='發生錯誤：'+e.message+(res.length?`（已完成 ${res.length} 段，可按「完成」先匯入）`:'');importBuf=res}
+};
+
+/* ============ notes ============ */
+function addNote(t,text,shotId){const v=cur();if(!v)return null;const n={id:uid(),t:t??null,text:text||'',shotId:shotId||null,created:Date.now()};v.notes.push(n);sortNotes(v);save();renderNotes();renderShots();renderSide();return n}
+function sortNotes(v){v.notes.sort((a,b)=>(a.t??1e9)-(b.t??1e9)||a.created-b.created)}
+$('bAddNote').onclick=()=>{const tx=$('noteIn').value.trim();if(!tx)return;addNote($('noteAtTime').checked?now():null,tx);$('noteIn').value=''};
+$('noteIn').onkeydown=e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();$('bAddNote').click()}};
+const urlCache={};
+async function shotURL(id){if(urlCache[id])return urlCache[id];const b=await shotGet(id);if(!b)return'';return urlCache[id]=URL.createObjectURL(b)}
+async function renderNotes(){
+  const v=cur(),box=$('notes');$('ntCount').textContent=v&&v.notes.length?`(${v.notes.length})`:'';
+  if(!v){box.innerHTML='';return}
+  if(!v.notes.length){box.innerHTML='<p class="hint">還沒有筆記。看影片時按 <span class="kbd">N</span> 快速記筆記，按 <span class="kbd">S</span> 截圖。</p>';return}
+  box.innerHTML=v.notes.map(n=>`<div class="note" data-n="${n.id}"><div class="h">${n.t!=null?`<span class="ts" data-seek="${n.t}">▶ ${fmt(n.t)}</span>`:'<span>（無時間）</span>'}<span style="flex:1"></span><button class="ghost" data-del="${n.id}">刪除</button></div><div class="tx" contenteditable="true" data-tx="${n.id}">${esc(n.text)}</div>${n.shotId?`<img data-shot="${n.shotId}" data-note="${n.id}" alt="截圖">`:''}</div>`).join('');
+  for(const img of box.querySelectorAll('img[data-shot]'))img.src=await shotURL(img.dataset.shot);
+}
+$('notes').addEventListener('click',e=>{const t=e.target,v=cur();if(t.dataset.seek){seek(+t.dataset.seek);return}
+  if(t.dataset.del){const n=v.notes.find(x=>x.id===t.dataset.del);if(!confirmBox('刪除這則筆記'+(n.shotId?'（含截圖）':'')+'？'))return;if(n.shotId)shotDel(n.shotId);v.notes=v.notes.filter(x=>x!==n);save();renderNotes();renderShots();renderSide();return}
+  if(t.dataset.shot)openLB(t.dataset.note)});
+$('notes').addEventListener('focusout',e=>{const id=e.target.dataset.tx;if(!id)return;const n=cur().notes.find(x=>x.id===id);if(n&&n.text!==e.target.innerText){n.text=e.target.innerText.trim();save()}});
+function notesMd(v,withTranscript){
+  let s=`# ${v.title||v.ytId}\n\nhttps://www.youtube.com/watch?v=${v.ytId}\n\n## 筆記\n\n`;
+  v.notes.forEach(n=>{s+=`- ${n.t!=null?`[${fmt(n.t)}](https://www.youtube.com/watch?v=${v.ytId}&t=${Math.floor(n.t)}s) `:''}${n.text.replace(/\n/g,'\n  ')}${n.shotId?' （附截圖）':''}\n`});
+  if(withTranscript&&v.segs.length){s+=`\n## 逐字稿\n\n`;v.segs.forEach(g=>{s+=`**${fmt(g.t)}**${g.sp?` ${v.speakers?.[g.sp]||g.sp}：`:' '}${g.text}\n${g.zh?`> ${g.zh}\n`:''}\n`})}
+  return s;
+}
+$('bCopyNotes').onclick=async()=>{const v=cur();if(!v)return;try{await navigator.clipboard.writeText(notesMd(v,false));toast('已複製筆記（Markdown）')}catch{toast('複製失敗')}};
+$('btnExportMd').onclick=()=>{const v=cur();if(!v){toast('請先選擇影片');return}download((v.title||v.ytId).replace(/[\\/:*?"<>|]/g,'_')+'.md',new Blob([notesMd(v,true)],{type:'text/markdown'}))};
+
+/* ============ screenshots ============ */
+let capStream=null,capVideo=null;
+function capUI(){const on=!!(capStream&&capStream.active);$('capState').textContent=on?'● 已開啟畫面分享，按 📷 或 S 即可截圖':'截圖功能：第一次按 📷 時，瀏覽器會詢問要分享哪個畫面，請選「這個分頁」。之後同一次開啟期間都不必再選。';$('capState').classList.toggle('on',on);$('bStopCap').style.display=on?'':'none'}
+$('bStopCap').onclick=()=>{capStream?.getTracks().forEach(t=>t.stop());capStream=null;capUI()};
+async function ensureCap(){
+  if(capStream&&capStream.active)return true;
+  if(!navigator.mediaDevices?.getDisplayMedia){toast('此瀏覽器不支援畫面擷取，請用電腦版 Chrome 或 Edge');return false}
+  try{
+    capStream=await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:'browser',frameRate:30,width:{ideal:3840},height:{ideal:2160}},audio:false,preferCurrentTab:true,selfBrowserSurface:'include',surfaceSwitching:'exclude'});
+  }catch(e){toast('未取得畫面分享權限');return false}
+  capVideo=document.createElement('video');capVideo.muted=true;capVideo.srcObject=capStream;await capVideo.play();
+  capStream.getVideoTracks()[0].addEventListener('ended',()=>{capStream=null;capUI()});
+  capUI();await new Promise(r=>setTimeout(r,400));return true;
+}
+async function takeShot(){
+  const v=cur();if(!v){toast('請先選擇影片');return}
+  if(!await ensureCap())return;
+  const wrap=$('playerWrap');wrap.scrollIntoView({block:'nearest'});
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  const r=wrap.getBoundingClientRect(),vw=capVideo.videoWidth,vh=capVideo.videoHeight;
+  const sx=vw/window.innerWidth,sy=vh/window.innerHeight;
+  if(Math.abs(sx-sy)/sx>0.08){toast('分享的畫面似乎不是這個分頁，請按「停止分享」後重選「這個分頁」');}
+  const c=document.createElement('canvas');c.width=Math.round(r.width*sx);c.height=Math.round(r.height*sy);
+  c.getContext('2d').drawImage(capVideo,r.left*sx,r.top*sy,r.width*sx,r.height*sy,0,0,c.width,c.height);
+  const blob=await new Promise(res=>c.toBlob(res,'image/png'));
+  const t=now(),id=uid();await shotSet(id,blob);
+  const f=$('flash');f.style.opacity=.7;setTimeout(()=>f.style.opacity=0,120);
+  const n=addNote(t,'',id);toast('已截圖 '+fmt(t)+'，可到「筆記」加上說明');
+}
+$('bShot').onclick=takeShot;
+$('bNote').onclick=()=>{switchTab('nt');$('noteAtTime').checked=true;$('noteIn').focus()};
+async function renderShots(){
+  const v=cur(),box=$('shots');const list=v?v.notes.filter(n=>n.shotId):[];$('shCount').textContent=list.length?`(${list.length})`:'';
+  if(!list.length){box.innerHTML='<p class="hint">還沒有截圖。</p>';return}
+  box.innerHTML=list.map(n=>`<figure data-note="${n.id}"><img data-shot="${n.shotId}" alt=""><figcaption>${n.t!=null?fmt(n.t):''} ${esc(n.text)}</figcaption></figure>`).join('');
+  for(const img of box.querySelectorAll('img'))img.src=await shotURL(img.dataset.shot);
+}
+$('shots').addEventListener('click',e=>{const f=e.target.closest('figure');if(f)openLB(f.dataset.note)});
+let lbNote=null;
+async function openLB(nid){const n=cur().notes.find(x=>x.id===nid);if(!n)return;lbNote=n;$('lbImg').src=await shotURL(n.shotId);$('lbTime').textContent=n.t!=null?fmt(n.t):'';$('lb').classList.add('on')}
+$('lbClose').onclick=()=>$('lb').classList.remove('on');
+$('lbSeek').onclick=()=>{if(lbNote.t!=null)seek(lbNote.t);$('lb').classList.remove('on')};
+$('lbDl').onclick=async()=>{const b=await shotGet(lbNote.shotId);download(`${(cur().title||'shot').slice(0,40).replace(/[\\/:*?"<>|]/g,'_')}_${fmt(lbNote.t).replace(/:/g,'-')}.png`,b)};
+$('lbCopy').onclick=async()=>{try{const b=await shotGet(lbNote.shotId);await navigator.clipboard.write([new ClipboardItem({'image/png':b})]);toast('圖片已複製，可直接貼到其他地方')}catch{toast('複製失敗')}};
+$('lbDel').onclick=async()=>{if(!confirmBox('刪除這張截圖？（筆記文字會保留）'))return;await shotDel(lbNote.shotId);lbNote.shotId=null;if(!lbNote.text)cur().notes=cur().notes.filter(x=>x!==lbNote);save();$('lb').classList.remove('on');renderNotes();renderShots();renderSide()};
+
+/* ============ tabs / keys / settings ============ */
+function switchTab(k){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===k));['tr','nt','sh'].forEach(x=>$('tab-'+x).style.display=x===k?'flex':'none')}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+document.addEventListener('keydown',e=>{
+  const tg=e.target;if(tg.isContentEditable||/INPUT|TEXTAREA|SELECT/.test(tg.tagName))return;if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.key==='Escape'){document.querySelectorAll('.modal.on').forEach(m=>m.classList.remove('on'));return}
+  if(document.querySelector('.modal.on'))return;
+  const k=e.key.toLowerCase();
+  if(k==='s'){e.preventDefault();takeShot()}else if(k==='n'){e.preventDefault();$('bNote').click()}
+  else if(k===' '){e.preventDefault();togglePlay()}else if(k==='arrowleft'){$('bBack').click()}else if(k==='arrowright'){$('bFwd').click()}
+});
+$('btnSettings').onclick=()=>{$('sKey').value=S.settings.apiKey||'';$('sModel').value=S.settings.model||'claude-sonnet-5-5';$('sLang').value=S.settings.lang;$('mSet').classList.add('on')};
+$('bCloseSet').onclick=()=>$('mSet').classList.remove('on');
+$('bSaveSet').onclick=()=>{S.settings.apiKey=$('sKey').value.trim();S.settings.model=$('sModel').value.trim()||'claude-sonnet-5-5';S.settings.lang=$('sLang').value;save();$('mSet').classList.remove('on');toast('已儲存設定')};
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m&&m.id==='lb')m.classList.remove('on')}));
+
+/* ============ backup ============ */
+const b2d=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
+$('btnBackup').onclick=async()=>{toast('打包中…');const shots={};for(const k of await shotKeys()){const b=await shotGet(k);if(b)shots[k]=await b2d(b)}
+  const data={app:'yt-study',ver:1,state:{...S,settings:{...S.settings,apiKey:''}},shots};
+  download(`影片筆記備份_${new Date().toISOString().slice(0,10)}.json`,new Blob([JSON.stringify(data)],{type:'application/json'}))};
+$('btnRestore').onclick=()=>$('restoreFile').click();
+$('restoreFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='yt-study')throw new Error('不是這個工具的備份檔');
+  if(!confirmBox('還原會用備份內容取代目前所有資料，確定嗎？'))return;
+  const key=S.settings.apiKey;S=d.state;S.settings.apiKey=key;
+  for(const [k,u] of Object.entries(d.shots||{})){const b=await (await fetch(u)).blob();await shotSet(k,b)}
+  save();renderAll();toast('還原完成')}catch(err){toast('還原失敗：'+err.message)}e.target.value=''};
+
+/* ============ init ============ */
+function renderAll(){const v=cur();$('vtitle').textContent=v?(v.title||''):'';$('empty').style.display=v?'none':'flex';$('view').value=S.settings.view||'bi';renderSide();renderSpk();renderSegs();renderNotes();renderShots()}
+(async()=>{
+  if(location.protocol==='file:')$('fileWarn').style.display='block';
+  try{idb=await openDB();const st=await kvGet('state');if(st)S=Object.assign(S,st)}catch(e){toast('無法使用瀏覽器儲存空間：'+e.message)}
+  if(!S.playlists.length){S.playlists.push({id:uid(),name:'我的教學影片',videos:[]})}
+  renderAll();if(S.current)openVideo(S.current);capUI();
+})();
+</script>
+</body>
+</html>

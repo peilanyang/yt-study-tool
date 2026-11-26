@@ -1,0 +1,8 @@
+#!/bin/sh
+# 資安規範：待提交內容含 Anthropic API 金鑰就拒絕 commit。
+# 啟用：git config core.hooksPath scripts/hooks
+if git diff --cached -U0 | grep -E '^\+' | grep -qE 'sk-ant-[A-Za-z0-9_-]{20,}'; then
+  echo "拒絕提交：偵測到疑似 Anthropic API 金鑰。請移除後再提交。" >&2
+  exit 1
+fi
+exit 0

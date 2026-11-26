@@ -1,0 +1,28 @@
+# Python 環境與快取
+.venv/
+__pycache__/
+*.pyc
+
+# 小程式產出：音訊、字幕
+transcriber/output/
+*.srt
+*.vtt
+*.m4a
+*.webm
+*.mp3
+*.mp4
+
+# 工具備份與匯出（docs/word/ 的正式文件保留）
+*備份*.json
+*.docx
+!docs/word/*.docx
+*.pdf
+
+# 本機設定與機密
+.env
+*.key
+
+# 作業系統雜檔
+Thumbs.db
+Desktop.ini
+.DS_Store
