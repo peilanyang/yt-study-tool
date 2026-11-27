@@ -215,8 +215,8 @@ export function openGen() {
   setStep(1);
   $('#dlgGen').showModal();
   navigator.clipboard.writeText(url).then(
-    () => { $('#copyState').textContent = '✓ 影片網址已複製。'; },
-    () => { $('#copyState').textContent = `請先複製影片網址（${url}）。`; },
+    () => { $('#copyState').textContent = '（影片網址已經幫你複製好了）'; },
+    () => { $('#copyState').textContent = `（請先複製這個網址：${url}）`; },
   );
   refreshAuto();
 }
@@ -227,11 +227,16 @@ async function refreshAuto() {
   const st = await outdir.status();
   $('#autoBox').hidden = st === 'unsupported';
   if (st === 'unsupported') { $('#manualBox').open = true; return; }
+  const status = $('#autoStatus');
+  status.className = 'status';
+  $('#autoSetup').hidden = st === 'ready';
+  $('#autoSteps').hidden = st !== 'ready';
   $('#bPickOut').hidden = st !== 'none';
   $('#bRegrant').hidden = st !== 'prompt';
-  if (st === 'none') { $('#autoStatus').textContent = '第一次使用：請選專案資料夾裡的 transcriber\\output，之後會自動帶入。'; return; }
-  if (st === 'prompt') { $('#autoStatus').textContent = `瀏覽器需要你再允許一次讀取「${await outdir.folderName()}」。`; return; }
-  $('#autoStatus').textContent = '⏳ 等待字幕檔…（小程式完成後會自動帶入）';
+  $('#setupHow').hidden = st !== 'none';
+  if (st === 'none') { status.textContent = ''; return; }
+  if (st === 'prompt') { status.textContent = `瀏覽器為了安全，要你再按一次「允許」才能讀取「${await outdir.folderName()}」資料夾。`; return; }
+  status.textContent = '⏳ 正在等字幕…有字幕的影片幾秒鐘就好；沒有字幕要把語音轉成文字，時間大約和影片一樣長。';
   const check = async () => {
     const v = ctx.cur();
     if (!v || raw.length) return;
@@ -242,9 +247,11 @@ async function refreshAuto() {
       $('#rawIn').value = found.srt;
       pendingChapters = found.chapters;
       updateRaw();
-      $('#autoStatus').textContent = `✓ 已自動帶入：${found.name}${found.chapters.length ? `（含作者章節 ${found.chapters.length} 個）` : ''}`;
+      $('#autoSteps').hidden = true;
+      status.className = 'status ok';
+      status.textContent = `✓ 字幕已經自動帶入${found.chapters.length ? `（含作者章節 ${found.chapters.length} 個）` : ''}。請往下做步驟 2。`;
     } catch (e) {
-      $('#autoStatus').textContent = '讀取字幕資料夾失敗：' + e.message;
+      status.textContent = '讀取字幕資料夾失敗：' + e.message;
     }
   };
   await check();

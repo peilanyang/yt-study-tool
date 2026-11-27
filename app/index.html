@@ -154,23 +154,34 @@
     <section class="step" id="step1">
       <h3>步驟 1：取得字幕</h3>
       <div class="auto" id="autoBox">
-        <p class="strong">用 Windows 小程式（建議）</p>
-        <p class="hint"><span id="copyState">影片網址已複製。</span>請雙擊專案資料夾裡的 <code>transcriber\transcribe.bat</code>，按 Enter。有字幕幾秒完成；沒有字幕會轉語音，需要比較久。</p>
-        <div class="row wrap">
-          <button class="primary" id="bPickOut" hidden>選擇字幕資料夾（transcriber\output）</button>
-          <button class="primary" id="bRegrant" hidden>允許讀取字幕資料夾</button>
-          <span class="hint" id="autoStatus"></span>
+        <div id="autoSetup" hidden>
+          <p class="strong">先做一次設定：告訴工具字幕會放在哪裡</p>
+          <p id="setupHow">按下面的按鈕，在跳出的視窗依序點進 <span class="path">影片教學工具 &gt; transcriber &gt; <b>output</b></span>，再按「選取資料夾」。以後就不用再設定。</p>
+          <div class="row wrap">
+            <button class="primary" id="bPickOut" hidden>選擇字幕資料夾</button>
+            <button class="primary" id="bRegrant" hidden>允許讀取字幕資料夾</button>
+          </div>
         </div>
+        <div id="autoSteps" hidden>
+          <p class="strong">照著做，字幕就會自動出現：</p>
+          <ol class="todo">
+            <li>依序打開 <span class="path">影片教學工具 &gt; transcriber &gt; <b>transcribe.bat</b></span>（雙擊），會出現一個黑色視窗。</li>
+            <li>黑色視窗問「要處理這部影片嗎？」，按 <kbd>Enter</kbd>。<span class="hint" id="copyState">（影片網址已經幫你複製好了）</span></li>
+            <li>如果問影片語言：中文按 <kbd>1</kbd>、英文按 <kbd>2</kbd>，再按 <kbd>Enter</kbd>。問模式時直接按 <kbd>Enter</kbd>。</li>
+            <li>等黑色視窗跑完，字幕會<b>自動</b>出現在這裡。這個視窗不用關。</li>
+          </ol>
+        </div>
+        <p class="status" id="autoStatus"></p>
       </div>
       <details id="manualBox">
-        <summary>沒有小程式？手動貼上 YouTube 轉錄稿或上傳 .srt</summary>
+        <summary>其他方式：自己從 YouTube 複製字幕，或上傳 .srt 字幕檔</summary>
       <ol class="howto">
         <li><a id="ytOpen" href="#" target="_blank" rel="noopener noreferrer">在 YouTube 打開這部影片 ↗</a></li>
         <li>影片下方說明欄按「…更多」，往下捲到「轉錄稿」，按「顯示轉錄稿」。</li>
         <li>右側出現「時間＋文字」：用滑鼠從第一行<b>拖曳</b>選到最後一行，按 <kbd>Ctrl</kbd>+<kbd>C</kbd>（不要用 Ctrl+A）。</li>
         <li>回到這裡，在下面框框按 <kbd>Ctrl</kbd>+<kbd>V</kbd>。</li>
       </ol>
-      <p class="hint">找不到「顯示轉錄稿」代表影片沒有字幕，之後可用 Windows 小程式處理。也可以直接上傳 .srt / .vtt 字幕檔。</p>
+      <p class="hint">找不到「顯示轉錄稿」代表影片沒有字幕，請改用 <span class="path">影片教學工具 &gt; transcriber &gt; <b>transcribe.bat</b></span>。也可以直接上傳 .srt / .vtt 字幕檔。</p>
       <textarea id="rawIn" rows="7" placeholder="0:00&#10;Hello everyone, welcome back…"></textarea>
       <div class="row"><input type="file" id="subFile" accept=".srt,.vtt,.txt"></div>
       </details>
@@ -178,7 +189,7 @@
     </section>
     <section class="step" id="step2">
       <h3>步驟 2：交給 Claude 整理</h3>
-      <p class="hint">按下面的按鈕複製提示詞，貼到 Claude 對話送出。Claude 會加上標點、分段、標出講者與時間。字幕很長時會分成幾份，請依序處理。</p>
+      <p class="hint">按下面的按鈕複製提示詞，貼到 Claude 對話送出。Claude 會加上標點、修正錯字、分段、標出講者與時間。字幕很長時會分成幾份，請依序處理。<br>不想整理？直接按最下面的「直接匯入字幕（不整理）」。</p>
       <div class="row wrap" id="parts"></div>
     </section>
     <section class="step" id="step3">
