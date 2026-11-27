@@ -8,6 +8,7 @@
 - .bat 檔含中文時 cmd.exe 會把指令切壞（安裝失敗、出現 'nv' is not recognized）：.bat 改為純 ASCII，安裝流程與中文訊息移到 install.py；pre-commit 擋含非 ASCII 的 .bat。
 
 ### 新增
+- 章節（T14、F13）：整理逐字稿時 Claude 一併產生章節標題與一句摘要；有作者章節時以作者的時間與標題為準；逐字稿上方顯示章節卡片（點了從該處播放、目前章節標示、可改名）；翻譯時章節一起翻；匯出 Markdown 以章節為小標題。
 - Windows 字幕小程式（T05）：先抓 YouTube 字幕（人工優先、自動其次），沒有字幕才用 faster-whisper 在本機轉文字；中文轉繁體；抓作者章節；支援播放清單、本機影音檔、讀剪貼簿網址。
 - 「產生逐字稿」自動複製網址，並自動帶入小程式產生的字幕檔（選一次 transcriber/output 資料夾）。
 - v2 工具骨架（T04）：`app/` 拆成 ES Modules；`start.bat` 本機伺服器（只限 127.0.0.1）。

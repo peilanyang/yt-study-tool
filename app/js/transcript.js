@@ -2,7 +2,8 @@
 'use strict';
 import { $, $$, html, setHtml, fmt, toast } from './util.js';
 import { parseSubtitles, groupRaw } from './subtitles.js';
-import { PART_LINES, chunk, buildOrganizePrompt, buildTranslatePrompt, parseOrganizeReply, parseTranslateReply } from './claude.js';
+import { PART_LINES, chunk, buildOrganizePrompt, buildTranslatePrompt, parseOrganizeReply, parseTranslateReply, parseTranslateChapters } from './claude.js';
+import { buildChapters, displayChapters, chapterIndexAt, authorInRange } from './chapters.js';
 import { segIndexAt } from './model.js';
 import * as player from './player.js';
 import * as outdir from './outputdir.js';
@@ -32,6 +33,7 @@ export function initTranscript(c) {
     ctx.state.settings.view = v; ctx.save(); render();
   });
   $('#q').addEventListener('input', render);
+  $('#chBar').addEventListener('click', onChapterClick);
   $('#bTranslate').addEventListener('click', openTranslate);
   initGenDialog();
   initTranslateDialog();
@@ -64,6 +66,8 @@ export function render() {
     <span class="spk"><span class="chip" style="background:${COLORS[k] || '#666'}">${k}</span><input type="text" data-spk="${k}" value="${v.speakers?.[k] || '講者 ' + k}" aria-label="講者 ${k} 名稱"></span>`),
     html`<span class="hint">（點段落前的標籤可改講者）</span>`]);
 
+  renderChapters(v, view);
+
   const q = $('#q').value.trim().toLowerCase();
   const mark = (text) => {
     if (!q) return text;
@@ -95,6 +99,65 @@ export function render() {
       </div>
     </div>`;
   }));
+}
+
+/* ---------- 章節（F13） ---------- */
+let lastCh = -2;
+
+function renderChapters(v, view) {
+  lastCh = -2;
+  const chs = displayChapters(v);
+  $('#chBar').hidden = !chs.length;
+  if (!chs.length) { setHtml($('#chBar'), ''); return; }
+  const fromAuthor = !(v.chapters && v.chapters.length);
+  setHtml($('#chBar'), html`
+    <div class="h"><b>章節</b><span class="hint">${chs.length} 個 · 點一下從該處播放${fromAuthor ? ' · 影片作者訂的章節（交給 Claude 整理後會加上摘要）' : ''}</span></div>
+    <div class="chcards">${chs.map((c, i) => {
+      const zhT = view !== 'o' && c.zhTitle ? c.zhTitle : '';
+      const title = view === 'z' && zhT ? zhT : c.title;
+      const sum = view !== 'o' && c.zhSummary ? c.zhSummary : c.summary;
+      return html`<button class="chcard" data-ch="${i}" title="${c.summary || c.title}">
+        <span class="ct">${fmt(c.t)}</span>
+        <span class="tt">${title}</span>
+        ${view === 'bi' && zhT ? html`<span class="zt">${zhT}</span>` : ''}
+        ${sum ? html`<span class="sm">${sum}</span>` : ''}
+        ${fromAuthor ? '' : html`<span class="ren" role="button" data-ren="${i}" title="修改章節標題">✎ 改名</span>`}
+      </button>`;
+    })}</div>`);
+}
+
+function onChapterClick(e) {
+  const v = ctx.cur();
+  if (!v) return;
+  const ren = e.target.closest('[data-ren]');
+  if (ren) {
+    e.stopPropagation();
+    const c = v.chapters[Number(ren.dataset.ren)];
+    const view = ctx.state.settings.view;
+    const useZh = view === 'z' && c.zhTitle;
+    const val = prompt('章節標題', useZh ? c.zhTitle : c.title);
+    if (val == null || !val.trim()) return;
+    if (useZh) c.zhTitle = val.trim().slice(0, 200); else c.title = val.trim().slice(0, 200);
+    ctx.touch(); render();
+    return;
+  }
+  const card = e.target.closest('[data-ch]');
+  if (card) player.seek(displayChapters(v)[Number(card.dataset.ch)].t);
+}
+
+function followChapter(v, t) {
+  const chs = displayChapters(v);
+  if (!chs.length) return;
+  const i = chapterIndexAt(chs, t);
+  if (i === lastCh) return;
+  $('#chBar .chcard.cur')?.classList.remove('cur');
+  const el = $(`#chBar .chcard[data-ch="${i}"]`);
+  if (el) {
+    el.classList.add('cur');
+    const box = el.parentElement;
+    box.scrollLeft = el.offsetLeft - box.offsetLeft - 8;
+  }
+  lastCh = i;
 }
 
 function onSegClick(e) {
@@ -145,6 +208,7 @@ function onSegBlur(e) {
 function followPlayback() {
   const v = ctx.cur();
   if (!v || !v.segs.length || !player.isReady()) return;
+  followChapter(v, player.now());
   const i = segIndexAt(v.segs, player.now());
   if (i === lastIdx) return;
   $('#segs .seg.cur')?.classList.remove('cur');
@@ -180,7 +244,10 @@ function initGenDialog() {
     const n = Number(i);
     const prev = n > 0 ? parts[n - 1].slice(-4).map((l) => l.text).join(' ') : '';
     try {
-      await navigator.clipboard.writeText(buildOrganizePrompt(parts[n], prev));
+      const author = pendingChapters.length ? pendingChapters : (ctx.cur()?.authorChapters || []);
+      const from = n > 0 ? parts[n][0].t : 0;
+      const to = parts[n + 1] ? parts[n + 1][0].t : null;
+      await navigator.clipboard.writeText(buildOrganizePrompt(parts[n], prev, authorInRange(author, from, to), n > 0));
       e.target.textContent = `✓ 已複製第 ${n + 1} / ${parts.length} 份`;
       toast('已複製，請貼到 Claude 對話送出');
       setStep(3);
@@ -297,9 +364,12 @@ function commit(segs) {
   segs.sort((a, b) => a.t - b.t);
   if (segs.length) segs[0].para = true;
   if (v.segs.length && !confirm('取代這部影片原本的逐字稿？（筆記與截圖不受影響）')) return;
+  if (pendingChapters.length) v.authorChapters = pendingChapters;
+  v.chapters = buildChapters(segs, v.authorChapters || []);
+  for (const s of segs) delete s.ch;
+  for (const c of v.chapters) { const i = segs.findIndex((s) => s.t >= c.t - 0.3); if (i >= 0) segs[i].para = true; }
   v.segs = segs;
   v.mode = 'transcript';
-  if (pendingChapters.length) v.authorChapters = pendingChapters;
   for (const k of new Set(segs.map((s) => s.sp))) if (k && !v.speakers[k]) v.speakers[k] = '講者 ' + k;
   ctx.touch();
   $('#dlgGen').close();
@@ -312,6 +382,7 @@ function commit(segs) {
 const TR_SEGS = 80;
 let trParts = [];
 let trMap = new Map();
+let trChMap = new Map();
 
 function initTranslateDialog() {
   const dlg = $('#dlgTr');
@@ -321,7 +392,8 @@ function initTranslateDialog() {
     if (i == null) return;
     const n = Number(i);
     try {
-      await navigator.clipboard.writeText(buildTranslatePrompt(trParts[n], n * TR_SEGS, ctx.state.settings.lang));
+      const chs = n === 0 ? (ctx.cur().chapters || []) : [];
+      await navigator.clipboard.writeText(buildTranslatePrompt(trParts[n], n * TR_SEGS, ctx.state.settings.lang, chs));
       e.target.textContent = `✓ 已複製第 ${n + 1} / ${trParts.length} 份`;
       toast('已複製，請貼到 Claude 對話送出');
     } catch { toast('複製失敗，請允許瀏覽器使用剪貼簿'); }
@@ -332,6 +404,7 @@ function initTranslateDialog() {
     if (!trMap.size) { toast('還沒有加入翻譯'); return; }
     const v = ctx.cur();
     trMap.forEach((zh, i) => { if (v.segs[i]) v.segs[i].zh = zh; });
+    trChMap.forEach((c, k) => { const ch = v.chapters?.[k]; if (ch) { ch.zhTitle = c.title; ch.zhSummary = c.summary; } });
     ctx.state.settings.view = 'bi';
     ctx.touch(); ctx.save();
     $('#dlgTr').close();
@@ -345,6 +418,7 @@ function openTranslate() {
   if (!v || !v.segs.length) return;
   trParts = chunk(v.segs, TR_SEGS);
   trMap = new Map();
+  trChMap = new Map();
   $('#trIn').value = ''; $('#trInfo').textContent = '';
   setHtml($('#trParts'), trParts.map((p, i) => html`<button class="primary" data-part="${i}">複製翻譯提示詞${trParts.length > 1 ? `（第 ${i + 1} / ${trParts.length} 份）` : ''}</button>`));
   $('#dlgTr').showModal();
@@ -353,6 +427,7 @@ function openTranslate() {
 function addTr() {
   try {
     parseTranslateReply($('#trIn').value).forEach((zh, i) => trMap.set(i, zh));
+    parseTranslateChapters($('#trIn').value).forEach((c, k) => trChMap.set(k, c));
     $('#trIn').value = '';
     $('#trInfo').textContent = `已加入 ${trMap.size} / ${ctx.cur().segs.length} 段。`;
     return true;

@@ -52,6 +52,16 @@ export function normalizeState(input) {
       authorChapters: (Array.isArray(v.authorChapters) ? v.authorChapters : [])
         .filter((c) => c && typeof c.title === 'string')
         .map((c) => ({ t: Math.max(0, Number(c.t) || 0), title: c.title.slice(0, 200) })),
+      chapters: (Array.isArray(v.chapters) ? v.chapters : [])
+        .filter((c) => c && typeof c.title === 'string' && c.title.trim())
+        .map((c) => ({
+          t: Math.max(0, Number(c.t) || 0),
+          title: c.title.slice(0, 200),
+          summary: String(c.summary || '').slice(0, 500),
+          zhTitle: String(c.zhTitle || '').slice(0, 200),
+          zhSummary: String(c.zhSummary || '').slice(0, 500),
+        }))
+        .sort((a, b) => a.t - b.t),
       added: Number(v.added) || now,
       updatedAt: Number(v.updatedAt) || now,
     };
@@ -84,7 +94,7 @@ export function normalizeState(input) {
 
 export function newVideo(ytIdValue, mode) {
   const now = Date.now();
-  return { id: uid(), ytId: ytIdValue, title: '', mode, speakers: { A: '講者 A', B: '講者 B' }, segs: [], notes: [], authorChapters: [], added: now, updatedAt: now };
+  return { id: uid(), ytId: ytIdValue, title: '', mode, speakers: { A: '講者 A', B: '講者 B' }, segs: [], notes: [], authorChapters: [], chapters: [], added: now, updatedAt: now };
 }
 
 /** 加入影片到清單；同一部影片已存在就沿用。回傳影片 id。 */
@@ -152,7 +162,13 @@ export function toMarkdown(v) {
   for (const n of v.notes) s += `- ${n.t != null ? tl(n.t) + ' ' : ''}${n.text.replace(/\n/g, '\n  ')}${n.shotId ? '（附截圖）' : ''}\n`;
   if (v.segs.length) {
     s += '\n## 逐字稿\n\n';
+    const chs = (v.chapters && v.chapters.length ? v.chapters : (v.authorChapters || [])).slice().sort((a, b) => a.t - b.t);
+    let ci = 0;
     for (const g of v.segs) {
+      while (ci < chs.length && chs[ci].t <= g.t + 0.3) {
+        const c = chs[ci++];
+        s += `### ${tl(c.t)} ${c.title}\n\n${c.summary ? `*${c.summary}*\n\n` : ''}`;
+      }
       const who = g.sp ? `${v.speakers?.[g.sp] || g.sp}：` : '';
       s += `**${tl(g.t)}** ${who}${g.text}\n${g.zh ? `> ${g.zh}\n` : ''}\n`;
     }
