@@ -20,6 +20,12 @@ import sys
 import time
 from pathlib import Path
 
+# 下載模型時的英文警告對使用者沒有幫助（Windows 不支援 symlink、未登入 HF），先關掉。
+os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
+os.environ.setdefault("HF_HUB_VERBOSITY", "error")
+import warnings  # noqa: E402
+warnings.filterwarnings("ignore", module="huggingface_hub")
+
 HERE = Path(__file__).resolve().parent
 OUTPUT = HERE / "output"
 AUDIO_DIR = OUTPUT / "_audio"
