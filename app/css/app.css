@@ -120,6 +120,7 @@ mark { background: #fde68a; }
 dialog { border: 0; border-radius: 16px; padding: 0; max-width: min(760px, 94vw); width: 100%; box-shadow: 0 10px 40px #00000040; }
 dialog::backdrop { background: #0008; }
 .box { padding: 22px; display: flex; flex-direction: column; gap: 10px; max-height: 90vh; overflow: auto; }
+.box > *, .step > *, details > * { flex-shrink: 0; } /* 內容超過視窗高度時捲動，不要把字幕框壓扁 */
 .box h2 { margin: 0; font-size: 19px; }
 .box h3 { margin: 0 0 4px; font-size: 15px; }
 .box > label { font-size: 13px; color: #44505c; }
@@ -166,3 +167,9 @@ body.theater #playerWrap { width: min(100%, calc((100vh - 260px) * 16 / 9)); }
 body.theater #left { height: calc(100vh - 80px); overflow: hidden; }
 body.theater #playerWrap { flex: 1 1 0; min-height: 160px; width: 100%; aspect-ratio: auto; margin: 0; }
 body.theater #left > .ctl, body.theater #vtitle { flex: none; }
+.auto { border: 1px dashed var(--line2); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; background: #fff; }
+.auto p { margin: 0; }
+details summary { cursor: pointer; font-size: 13px; color: var(--acc-ink); padding: 4px 0; }
+details[open] summary { margin-bottom: 6px; }
+#rawInfo { margin: 0; font-weight: 500; }
+code { background: #fff; border: 1px solid var(--line2); border-radius: 4px; padding: 0 4px; font-size: 12.5px; }

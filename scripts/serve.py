@@ -30,6 +30,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         ".svg": "image/svg+xml",
     }
 
+    def end_headers(self):
+        # 每次都向伺服器確認最新版，程式更新後重新整理就生效（使用者回報舊版快取）
+        self.send_header("Cache-Control", "no-cache")
+        super().end_headers()
+
     def log_message(self, format, *args):  # 不在視窗洗版
         pass
 

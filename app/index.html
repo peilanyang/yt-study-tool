@@ -153,6 +153,17 @@
     </ol>
     <section class="step" id="step1">
       <h3>步驟 1：取得字幕</h3>
+      <div class="auto" id="autoBox">
+        <p class="strong">用 Windows 小程式（建議）</p>
+        <p class="hint"><span id="copyState">影片網址已複製。</span>請雙擊專案資料夾裡的 <code>transcriber\transcribe.bat</code>，按 Enter。有字幕幾秒完成；沒有字幕會轉語音，需要比較久。</p>
+        <div class="row wrap">
+          <button class="primary" id="bPickOut" hidden>選擇字幕資料夾（transcriber\output）</button>
+          <button class="primary" id="bRegrant" hidden>允許讀取字幕資料夾</button>
+          <span class="hint" id="autoStatus"></span>
+        </div>
+      </div>
+      <details id="manualBox">
+        <summary>沒有小程式？手動貼上 YouTube 轉錄稿或上傳 .srt</summary>
       <ol class="howto">
         <li><a id="ytOpen" href="#" target="_blank" rel="noopener noreferrer">在 YouTube 打開這部影片 ↗</a></li>
         <li>影片下方說明欄按「…更多」，往下捲到「轉錄稿」，按「顯示轉錄稿」。</li>
@@ -161,7 +172,9 @@
       </ol>
       <p class="hint">找不到「顯示轉錄稿」代表影片沒有字幕，之後可用 Windows 小程式處理。也可以直接上傳 .srt / .vtt 字幕檔。</p>
       <textarea id="rawIn" rows="7" placeholder="0:00&#10;Hello everyone, welcome back…"></textarea>
-      <div class="row"><input type="file" id="subFile" accept=".srt,.vtt,.txt"><span class="hint" id="rawInfo"></span></div>
+      <div class="row"><input type="file" id="subFile" accept=".srt,.vtt,.txt"></div>
+      </details>
+      <p class="hint" id="rawInfo"></p>
     </section>
     <section class="step" id="step2">
       <h3>步驟 2：交給 Claude 整理</h3>
@@ -174,7 +187,7 @@
       <div class="row"><button id="bAddPart">加入這一份</button><span class="hint" id="jsonInfo"></span></div>
     </section>
     <div class="row end">
-      <button id="bRawOnly" class="ghost">不整理，直接匯入字幕</button>
+      <button id="bRawOnly" title="跳過步驟 2、3，直接把原始字幕放進逐字稿">直接匯入字幕（不整理）</button>
       <span class="grow"></span>
       <button data-close>取消</button>
       <button class="dark" id="bGenDone">完成</button>

@@ -51,3 +51,14 @@ export function groupRaw(lines, seconds = 20) {
   }
   return segs;
 }
+
+/** 作者章節 JSON → [{t, title}]，只保留合法欄位 */
+export function parseChapters(text) {
+  let arr;
+  try { arr = JSON.parse(text); } catch { return []; }
+  if (!Array.isArray(arr)) return [];
+  return arr
+    .filter((c) => c && typeof c.title === 'string' && c.title.trim())
+    .map((c) => ({ t: Math.max(0, Number(c.t) || 0), title: c.title.trim().slice(0, 200) }))
+    .sort((a, b) => a.t - b.t);
+}

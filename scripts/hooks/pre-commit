@@ -5,4 +5,11 @@ if git diff --cached -U0 | grep -E '^\+' | grep -qE 'sk-ant-[A-Za-z0-9_-]{20,}';
   echo "拒絕提交：偵測到疑似 Anthropic API 金鑰。請移除後再提交。" >&2
   exit 1
 fi
+# .bat 檔只能用 ASCII：cmd.exe 讀到 UTF-8 中文會把指令切壞（T05 實測）。
+for f in $(git diff --cached --name-only --diff-filter=ACM | grep -iE '\.bat$'); do
+  if git show ":$f" | LC_ALL=C grep -qP '[^\x00-\x7F]'; then
+    echo "拒絕提交：$f 含非 ASCII 字元。中文訊息請放到 Python 程式裡。" >&2
+    exit 1
+  fi
+done
 exit 0

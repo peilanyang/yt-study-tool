@@ -1,0 +1,6 @@
+# 版本鎖定（架構文件第 4 節）；升級需走變更流程，yt-dlp 例外可先升級後補記錄
+yt-dlp[default]==2026.11.23
+faster-whisper==1.2.1
+# av 19 移除了 faster-whisper 1.2.1 用到的 metadata_errors 參數，鎖在 18（有 Python 3.14 Windows 版）
+av==18.0.0
+opencc-python-reimplemented==0.1.7
