@@ -287,6 +287,7 @@ function addPart() {
     return true;
   } catch (e) {
     $('#jsonInfo').textContent = e.message;
+    toast(e.message);
     return false;
   }
 }

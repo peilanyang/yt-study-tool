@@ -47,8 +47,12 @@ ${JSON.stringify(items)}`;
 }
 
 /** 從 Claude 回覆抓出 JSON 陣列 */
+export const PROMPT_PASTED = '你貼上的是「提示詞」，不是 Claude 的回覆。請先把它貼到 Claude 對話送出，等 Claude 回覆完，按回覆下方的「複製」，再貼回這裡。';
+
 export function extractJsonArray(txt) {
   txt = String(txt || '').replace(/```(json)?/g, '');
+  // 常見錯誤：把剛複製的提示詞直接貼回來
+  if (txt.includes('只輸出 JSON 陣列') || txt.includes('你是專業的逐字稿編輯')) throw new Error(PROMPT_PASTED);
   const a = txt.indexOf('['), b = txt.lastIndexOf(']');
   if (a < 0 || b < a) throw new Error('找不到 JSON 陣列，請確認貼上的是 Claude 回覆的完整內容');
   let arr;

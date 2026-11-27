@@ -190,12 +190,19 @@
     </section>
     <section class="step" id="step2">
       <h3>步驟 2：交給 Claude 整理</h3>
-      <p class="hint">按下面的按鈕複製提示詞，貼到 Claude 對話送出。Claude 會加上標點、修正錯字、分段、標出講者與時間。字幕很長時會分成幾份，請依序處理。<br>不想整理？直接按最下面的「直接匯入字幕（不整理）」。</p>
+      <p class="hint">Claude 會加上標點、修正錯字、分段、標出講者與時間。照著做：</p>
+      <ol class="todo">
+        <li>按下面的橘色按鈕「複製提示詞」。</li>
+        <li><a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer">打開 Claude 新對話 ↗</a>，在輸入框按 <kbd>Ctrl</kbd>+<kbd>V</kbd> 貼上，按送出。</li>
+        <li>等 Claude 回覆完（一長串 <code>[{"t":</code> 開頭的文字），按回覆下方的「複製」。</li>
+        <li>回到這裡，貼到步驟 3 的框框，按「加入這一份」。</li>
+      </ol>
+      <p class="hint">字幕很長時會分成幾份（第 1 份、第 2 份…），每一份都重複上面 1～4。不想整理？直接按最下面的「直接匯入字幕（不整理）」。</p>
       <div class="row wrap" id="parts"></div>
     </section>
     <section class="step" id="step3">
       <h3>步驟 3：貼回 Claude 的回覆</h3>
-      <textarea id="jsonIn" rows="5" placeholder="把 Claude 回覆的內容整段貼到這裡（分成幾份時，每份貼完按「加入這一份」）"></textarea>
+      <textarea id="jsonIn" rows="5" placeholder="貼上 Claude 的回覆（一長串 [{&quot;t&quot;: 開頭的文字），再按「加入這一份」"></textarea>
       <div class="row"><button id="bAddPart">加入這一份</button><span class="hint" id="jsonInfo"></span></div>
     </section>
     <div class="row end">

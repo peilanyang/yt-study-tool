@@ -43,3 +43,9 @@ test('解析翻譯回覆', () => {
   assert.equal(m.size, 2);
   assert.throws(() => parseTranslateReply('[]'), /沒有找到/);
 });
+
+test('把提示詞直接貼回來時，給白話提示', async () => {
+  const { buildOrganizePrompt, parseOrganizeReply, PROMPT_PASTED } = await import('../../app/js/claude.js');
+  const prompt = buildOrganizePrompt([{ t: 0, text: 'hello' }]);
+  assert.throws(() => parseOrganizeReply(prompt), { message: PROMPT_PASTED });
+});

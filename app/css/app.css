@@ -169,7 +169,7 @@ body.theater #playerWrap { flex: 1 1 0; min-height: 160px; width: 100%; aspect-r
 body.theater #left > .ctl, body.theater #vtitle { flex: none; }
 .auto { border: 1px dashed var(--line2); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; background: #fff; }
 .auto p { margin: 0; }
-.auto .todo { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; line-height: 1.7; }
+.step .todo, .auto .todo { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; line-height: 1.7; }
 .auto .status { font-weight: 500; }
 .path { font-family: ui-monospace, Consolas, monospace; font-size: 13px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; white-space: nowrap; }
 .auto .status.ok { color: #15803d; }
