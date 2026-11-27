@@ -212,6 +212,7 @@ export function openGen() {
   setHtml($('#parts'), html`<span class="hint">完成步驟 1 後，這裡會出現「複製提示詞」按鈕。</span>`);
   const url = `https://www.youtube.com/watch?v=${v.ytId}`;
   $('#ytOpen').href = url;
+  $('#vidCode').textContent = v.ytId;
   setStep(1);
   $('#dlgGen').showModal();
   navigator.clipboard.writeText(url).then(

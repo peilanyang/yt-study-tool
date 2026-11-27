@@ -174,15 +174,16 @@
         <p class="status" id="autoStatus"></p>
       </div>
       <details id="manualBox">
-        <summary>其他方式：自己從 YouTube 複製字幕，或上傳 .srt 字幕檔</summary>
+        <summary>其他方式：自己從 YouTube 複製字幕貼上</summary>
       <ol class="howto">
         <li><a id="ytOpen" href="#" target="_blank" rel="noopener noreferrer">在 YouTube 打開這部影片 ↗</a></li>
         <li>影片下方說明欄按「…更多」，往下捲到「轉錄稿」，按「顯示轉錄稿」。</li>
         <li>右側出現「時間＋文字」：用滑鼠從第一行<b>拖曳</b>選到最後一行，按 <kbd>Ctrl</kbd>+<kbd>C</kbd>（不要用 Ctrl+A）。</li>
         <li>回到這裡，在下面框框按 <kbd>Ctrl</kbd>+<kbd>V</kbd>。</li>
       </ol>
-      <p class="hint">找不到「顯示轉錄稿」代表影片沒有字幕，請改用 <span class="path">影片教學工具 &gt; transcriber &gt; <b>transcribe.bat</b></span>。也可以直接上傳 .srt / .vtt 字幕檔。</p>
+      <p class="hint">找不到「顯示轉錄稿」代表影片沒有字幕，請改用上面的 <span class="path">影片教學工具 &gt; transcriber &gt; <b>transcribe.bat</b></span>。</p>
       <textarea id="rawIn" rows="7" placeholder="0:00&#10;Hello everyone, welcome back…"></textarea>
+      <p class="hint">字幕沒有自動出現時：按下面的「選擇檔案」，到 <span class="path">影片教學工具 &gt; transcriber &gt; <b>output</b></span> 選這部影片的字幕檔（檔名最後是 <b>[<span id="vidCode"></span>]</b> 的那個）。</p>
       <div class="row"><input type="file" id="subFile" accept=".srt,.vtt,.txt"></div>
       </details>
       <p class="hint" id="rawInfo"></p>
