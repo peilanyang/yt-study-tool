@@ -23,6 +23,8 @@ from pathlib import Path
 # 下載模型時的英文警告對使用者沒有幫助（Windows 不支援 symlink、未登入 HF），先關掉。
 os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 os.environ.setdefault("HF_HUB_VERBOSITY", "error")
+# xet 下載在部分網路會卡住且不顯示進度，改用一般 HTTPS（可續傳）。
+os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
 import warnings  # noqa: E402
 warnings.filterwarnings("ignore", module="huggingface_hub")
 
@@ -224,6 +226,65 @@ def download_text(url: str) -> str:
         return ydl.urlopen(url).read().decode("utf-8", "ignore")
 
 
+def disable_quick_edit() -> None:
+    """Windows 主控台的「快速編輯」：在黑視窗點一下就會暫停程式，看起來像當掉。關掉它。"""
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        k = ctypes.windll.kernel32
+        h = k.GetStdHandle(-10)  # STD_INPUT_HANDLE
+        mode = ctypes.c_uint()
+        if k.GetConsoleMode(h, ctypes.byref(mode)):
+            k.SetConsoleMode(h, (mode.value & ~0x0040) | 0x0080)  # 去掉 QUICK_EDIT，保留 EXTENDED_FLAGS
+    except Exception:
+        pass
+
+
+def dir_mb(path: Path) -> float:
+    total = 0
+    for p in path.rglob("*"):
+        try:
+            if p.is_file():
+                total += p.stat().st_size
+        except OSError:
+            pass
+    return total / 1048576
+
+
+class Heartbeat:
+    """長時間沒有輸出時，每 5 秒更新一行「已經過 X 分」，讓使用者知道還在跑。"""
+
+    def __init__(self, label: str, watch: Path | None = None):
+        self.label, self.watch = label, watch
+
+    def __enter__(self):
+        import threading
+        self.stop = threading.Event()
+        self.t0 = time.time()
+
+        def loop():
+            while not self.stop.wait(5):
+                s = int(time.time() - self.t0)
+                extra = f"，已下載 {dir_mb(self.watch):,.0f} MB" if self.watch and self.watch.exists() else ""
+                print(f"\r  {self.label}… 已經過 {s // 60} 分 {s % 60:02d} 秒{extra}   ", end="", flush=True)
+
+        self.th = threading.Thread(target=loop, daemon=True)
+        self.th.start()
+        return self
+
+    def __exit__(self, *exc):
+        self.stop.set()
+        self.th.join()
+        if time.time() - self.t0 >= 5:
+            print()
+
+
+def hf_cache() -> Path:
+    base = os.environ.get("HF_HUB_CACHE") or os.environ.get("HF_HOME")
+    return Path(base) if base else Path.home() / ".cache" / "huggingface" / "hub"
+
+
 def download_audio(url: str, video_id: str) -> Path:
     import yt_dlp
     AUDIO_DIR.mkdir(parents=True, exist_ok=True)
@@ -238,12 +299,18 @@ def transcribe_audio(path: Path, lang: str | None, model_key: str, duration: flo
     from faster_whisper import WhisperModel
     name = MODELS[model_key]
     say(f"載入語音辨識模型（{'準確' if model_key == 'accurate' else '快速'}模式：{name}）。第一次使用會先下載模型，請稍候…")
-    model = WhisperModel(name, device="cpu", compute_type="int8", cpu_threads=os.cpu_count() or 4)
+    with Heartbeat("下載／載入模型", hf_cache()):
+        model = WhisperModel(name, device="cpu", compute_type="int8", cpu_threads=os.cpu_count() or 4)
+    say("  模型就緒，開始辨識（先分析整段聲音，第一行進度可能要等 1～2 分鐘）")
     prompt = "以下是繁體中文的句子，包含標點符號。" if lang_base(lang or "") == "zh" else None
-    segments, info = model.transcribe(str(path), language=lang or None, vad_filter=True, beam_size=5, initial_prompt=prompt)
+    with Heartbeat("分析聲音"):
+        segments, info = model.transcribe(str(path), language=lang or None, vad_filter=True, beam_size=5, initial_prompt=prompt)
+        it = iter(segments)
+        first = next(it, None)
     total = duration or info.duration or 0
     out, t0 = [], time.time()
-    for s in segments:
+    import itertools
+    for s in itertools.chain([first] if first else [], it):
         out.append((s.start, s.end, s.text.strip()))
         if total:
             pct = min(100, s.end / total * 100)
@@ -364,6 +431,7 @@ def collect_inputs(raw: list[str]) -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    disable_quick_edit()
     p = argparse.ArgumentParser(description="YouTube 字幕小程式")
     p.add_argument("inputs", nargs="*")
     p.add_argument("--asr", action="store_true", help="不抓字幕，直接語音轉文字")
