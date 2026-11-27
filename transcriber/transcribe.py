@@ -393,9 +393,12 @@ def process_url(url: str, args) -> Path | None:
         return None
     try:
         entries, detected = transcribe_audio(audio, lang, model_key, info.get("duration"))
-    finally:
-        if not args.keep_audio:
-            audio.unlink(missing_ok=True)
+    except Exception as e:
+        say(f"\n  ✗ 語音轉文字失敗：{type(e).__name__}: {e}")
+        say("  已下載的聲音先保留，下次重跑不用再下載。請把這段訊息截圖給 Claude，或再執行一次 install.bat。")
+        return None
+    if not args.keep_audio:
+        audio.unlink(missing_ok=True)
     out = write_outputs(stem, entries, chapters, lang or detected)
     say(f"  ✓ 完成：{out.name}（{len(entries)} 行）")
     return out
