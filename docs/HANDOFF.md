@@ -13,7 +13,9 @@ YouTube 教學影片學習工具：貼網址 → 取得逐字稿（標點、分�
 - 階段：**2 開發**。關卡 G1（文件定稿）已於 2026-11-26 通過。
 - 仍待使用者確認：需求規格第 9 節 NFR-02、NFR-07 的「建議值」（可在驗收時依實測調整）。
 - Git：完成。GitHub 公開儲存庫 https://github.com/peilanyang/yt-study-tool ；使用者專案資料夾已是它的本機複本（main 追蹤 origin/main）。
-- 程式碼：T04 完成並合併到 main（2026-11-26，使用者 Windows 實測通過）。T05（Windows 小程式）完成於分支 `feature/t05-transcriber`，等使用者在 Windows 安裝試用後合併。再來 T14（章節）。
+- 程式碼：T04 完成並合併到 main（2026-11-26，使用者 Windows 實測通過）。T05（Windows 小程式）已完成並合併（2026-11-28，使用者在 Windows 實測：中文無字幕影片語音轉文字、自動帶入、匯入後點時間跳轉皆 OK）。下一個是 T14（章節）。
+
+T05 實測學到的事：.bat 只能用 ASCII（pre-commit 會擋）；av 鎖 18（19 與 faster-whisper 1.2.1 不相容）；本機伺服器送 no-cache；模型第一次下載約 1.6GB、慢網路要 30 分鐘以上。
 - 使用者實測回饋已處理：8000 埠被佔用改 8765（scripts/serve.py）、大畫面/全螢幕改善畫質、速度改 0.5/0.75/1/1.5/2、點影片後快捷鍵可用。
 - 已知：很多中文影片沒有 YouTube 字幕（字幕燒在畫面上），只能靠 T05 語音轉文字。
 - v1 舊版工具：`legacy/yt-study-v1.html`（單一 HTML，可用但不再擴充）。
