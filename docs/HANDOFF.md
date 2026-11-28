@@ -1,6 +1,6 @@
 # 專案交接檔（給下一個 Claude 對話）
 
-最後更新：2026-11-26 15:00（台北時間）
+最後更新：2026-11-28（台北時間）
 
 開新對話時請先讀完這份檔案，再接著工作。
 
@@ -11,7 +11,9 @@ YouTube 教學影片學習工具：貼網址 → 取得逐字稿（標點、分�
 ## 2. 目前進度
 
 - 階段：**2 開發**。關卡 G1（文件定稿）已於 2026-11-26 通過。
-- 仍待使用者確認：需求規格第 9 節 NFR-02、NFR-07 的「建議值」（可在驗收時依實測調整）。
+- 仍待使用者確認：
+  - 需求規格第 9 節 NFR-02、NFR-07 的「建議值」（可在驗收時依實測調整）。
+  - **播放速度文件與程式不一致**：需求規格 F11、A12、第 11 節寫 0.25 / 0.5 / 1 / 1.5 / 2；程式（`app/js/model.js` 的 `SPEEDS`）依使用者實測回饋已改為 0.5 / 0.75 / 1 / 1.5 / 2。需請使用者確認後，回頭更新 Claude Docs 正本並重新匯出 `docs/`。
 - Git：完成。GitHub 公開儲存庫 https://github.com/peilanyang/yt-study-tool ；使用者專案資料夾已是它的本機複本（main 追蹤 origin/main）。
 - 程式碼：T04 完成並合併到 main（2026-11-26，使用者 Windows 實測通過）。T05（Windows 小程式）已完成並合併（2026-11-28，使用者在 Windows 實測：中文無字幕影片語音轉文字、自動帶入、匯入後點時間跳轉皆 OK）。T14（章節）已完成並合併（2026-11-28，使用者以真實 Claude 回覆驗收 OK）。下一步候選：F12 整篇文章（可編輯、以章節為小標題）、T07 截圖標註、T08 Word/PDF 匯出、T13 雲端同步。
 
@@ -28,7 +30,8 @@ T05 實測學到的事：.bat 只能用 ASCII（pre-commit 會擋）；av 鎖 18
 | 文件集正本（Claude Docs，5 個分頁） | https://claude.ai/artifact/Mq82x1bgUWHZjfcG62ucqp |
 | 文件匯出版 | `docs/*.md`（圖在 `docs/images/`）、`docs/word/*.docx` |
 | UI Mockup（Design 畫布，6 個畫面） | https://claude.ai/artifact/9eoHq6FavFacooKHupqHFh |
-| GitHub | 尚未建立；決定為**公開**儲存庫，工具用 GitHub Pages 開啟 |
+| GitHub | https://github.com/peilanyang/yt-study-tool （公開）；GitHub Pages **尚未開啟**（2026-11-28 檢查 https://peilanyang.github.io/yt-study-tool/ 回 404） |
+| 目前開啟方式 | 專案資料夾的 `start.bat` → 本機伺服器 8765 埠（`scripts/serve.py`） |
 
 文件集分頁：需求規格、系統架構與品質規範、資安規範、專案管理、Git 版本管理規範。
 
@@ -41,7 +44,7 @@ T05 實測學到的事：.bat 只能用 ASCII（pre-commit 會擋）；av 鎖 18
 - 「整篇文章」：依主題自動分段、每段有時間；**可編輯**（改字、刪除、合併/切分段落、插入「我的補充」），另存一份不動原始逐字稿。
 - 截圖：每張附筆記框，截圖後立即可輸入；「截圖後暫停影片」預設勾選。
 - 截圖標註：方框、圈圈、線條、箭頭、文字、標號；5 色、3 種粗細；不做馬賽克。
-- 播放速度：0.25 / 0.5 / 1 / 1.5 / 2 倍。
+- 播放速度：文件寫 0.25 / 0.5 / 1 / 1.5 / 2 倍；實作已改 0.5 / 0.75 / 1 / 1.5 / 2（待確認，見第 2 節）。
 - 播放清單：新增 / 刪除 / 改名清單與影片；內建不可刪除的「未分類」預設清單。
 - 頁籤順序：逐字稿、截圖、筆記。
 - 雲端同步：透過 OneDrive / Google 雲端硬碟**資料夾**（File System Access API），多台 Windows 電腦；不需雲端帳號設定。
@@ -58,9 +61,10 @@ T05 實測學到的事：.bat 只能用 ASCII（pre-commit 會擋）；av 鎖 18
 
 ## 6. 下一步
 
-1. GitHub Pages 尚未開啟：等 T04 有 `app/` 後，請使用者在 GitHub 儲存庫 Settings → Pages → Deploy from a branch → main / (root) 開啟（Claude 無法用 API 開）。
-2. 依專案管理第 3 節任務表 T04 起開發，每個功能一條 `feature/` 分支；開發初期先實測風險 R9（字幕偵測）。
-3. commit 作者：`peilanyang <peilanyang@users.noreply.github.com>`；已啟用 `scripts/hooks/pre-commit` 金鑰掃描（`git config core.hooksPath scripts/hooks`）。
+1. 請使用者選下一個任務：F12 整篇文章、T07 截圖標註、T08 Word/PDF 匯出、T13 雲端同步。照工作偏好：先改文件／出 Mockup、使用者確認後才寫程式；每個功能一條 `feature/` 分支。
+2. 處理播放速度文件與程式不一致（見第 2 節）。
+3. GitHub Pages：`app/` 已存在，可請使用者在 GitHub 儲存庫 Settings → Pages → Deploy from a branch → main / (root) 開啟（Claude 無法用 API 開）。開啟前一律用 `start.bat`。
+4. commit 作者：`peilanyang <peilanyang@users.noreply.github.com>`；已啟用 `scripts/hooks/pre-commit` 金鑰掃描（`git config core.hooksPath scripts/hooks`）。
 
 ## 7. 技術備忘（給 Claude）
 
